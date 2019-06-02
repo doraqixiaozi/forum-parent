@@ -1,0 +1,8 @@
+#配置通过config配置文件服务器从git仓库拉去配置文件
+spring:
+  cloud:
+    config:
+      name: friend
+      profile: dev
+      label: master
+      uri: http://192.168.1.106:12000

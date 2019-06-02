@@ -1,0 +1,20 @@
+server:
+  port: 12000
+spring:
+  application:
+    name: forum-config
+#    配置git地址
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://gitee.com/doraqixiaozi/forum.git
+#消息总线需要使用此地址
+  rabbitmq:
+    host: 192.168.25.129
+#    暴露触发消息总线的地址
+management:
+  endpoints:
+    jmx:
+      exposure:
+        include: bus-refresh
