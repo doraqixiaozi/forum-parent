@@ -1,7 +1,10 @@
 package com.jqh.forum.user.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -9,7 +12,9 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.jqh.forum.user.mapper.AdminMapper;
 import entity.PageResult;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +40,8 @@ public class AdminService {
 
     @Autowired
     private IdWorker idWorker;
-
+    @Resource
+    private RedisTemplate redisTemplate;
 
     /**
      * 查询全部列表
@@ -138,5 +144,21 @@ public class AdminService {
             return DB_admin;
         }
         return null;
+    }
+
+    public Map<String, Object> getInfo(Claims claims) {
+        HashMap<String, Object> infoMap = new HashMap<>();
+        String id = claims.getId();
+        Admin admin = (Admin) redisTemplate.opsForValue().get("admin_info_" + id);
+        if (admin==null){
+            admin = adminMapper.selectByPrimaryKey(id);
+            redisTemplate.opsForValue().set("admin_info_" + id,admin,3, TimeUnit.DAYS);
+        }
+        infoMap.put("avatar","https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif");
+        infoMap.put("name", admin.getLoginname());
+        ArrayList<Object> roles = new ArrayList<>();
+        roles.add("admin");
+        infoMap.put("roles", roles);
+        return infoMap;
     }
 }

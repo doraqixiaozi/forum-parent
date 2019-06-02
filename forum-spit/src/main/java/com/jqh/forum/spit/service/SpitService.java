@@ -29,8 +29,9 @@ public class SpitService {
     private SpitDao spitDao;
     @Autowired
     private IdWorker idWorker;
-@Autowired
+    @Autowired
     private MongoTemplate mongoTemplate;
+
     public List<Spit> findAll() {
         return spitDao.findAll();
     }
@@ -48,12 +49,12 @@ public class SpitService {
         spit.setComment(0);//回复数
         spit.setState("1");//状态
         //如果此吐槽有父节点则说明是对某个吐槽的回复，父节点回复数应该加1
-        if (!StringUtils.isEmpty(spit.getParentid())){
-            Query query=new Query();
+        if (!StringUtils.isEmpty(spit.getParentid())) {
+            Query query = new Query();
             query.addCriteria(Criteria.where("_id").is(spit.getParentid()));
-            Update update=new Update();
-            update.inc("comment",1);
-            mongoTemplate.updateFirst(query,update,"spit");
+            Update update = new Update();
+            update.inc("comment", 1);
+            mongoTemplate.updateFirst(query, update, "spit");
         }
         spitDao.save(spit);
     }
@@ -66,26 +67,27 @@ public class SpitService {
         spitDao.deleteById(id);
     }
 
-    public Page<Spit> findByParentid(String parentId,int page,int size){
-        Pageable pageable= PageRequest.of(page-1,size);
-        return spitDao.findByParentid(parentId,pageable);
+    public Page<Spit> findByParentid(String parentId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return spitDao.findByParentid(parentId, pageable);
     }
 
-    public List<Spit> search(Spit spit){
+    public List<Spit> search(Spit spit) {
         ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("nickname", ExampleMatcher.GenericPropertyMatchers.contains()).withIgnoreCase();
-        return spitDao.findAll(Example.of(spit,matcher));
+        return spitDao.findAll(Example.of(spit, matcher));
     }
-    public Page<Spit> search(Spit spit,int page,int size){
+
+    public Page<Spit> search(Spit spit, int page, int size) {
         PageRequest request = PageRequest.of(page - 1, size);
         ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("nickname", ExampleMatcher.GenericPropertyMatchers.contains()).withIgnoreCase();
-        return spitDao.findAll(Example.of(spit,matcher),request);
+        return spitDao.findAll(Example.of(spit, matcher), request);
     }
 
     public void thumbup(String spitId) {
-        Query query=new Query();
+        Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(spitId));
-        Update update=new Update();
-        update.inc("thumbup",1);
-        mongoTemplate.updateFirst(query,update,"spit");
+        Update update = new Update();
+        update.inc("thumbup", 1);
+        mongoTemplate.updateFirst(query, update, "spit");
     }
 }

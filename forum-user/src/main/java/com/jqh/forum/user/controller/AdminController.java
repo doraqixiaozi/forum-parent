@@ -1,10 +1,13 @@
 package com.jqh.forum.user.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +17,8 @@ import com.jqh.forum.user.service.AdminService;
 import entity.Result;
 import entity.StatusCode;
 import util.JwtUtil;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 控制器层
@@ -30,6 +35,8 @@ public class AdminController {
     private AdminService adminService;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private HttpServletRequest request;
 
     /**
      * 查询全部数据
@@ -115,13 +122,37 @@ public class AdminController {
     public Result login(@RequestBody Admin admin) {
         admin = adminService.login(admin);
         if (admin == null) {
-            return new Result(false, StatusCode.LOGINERROR, "登陆失败");
+            return new Result(false, StatusCode.LOGINERROR, "登录失败");
         }
         //这里应该用户角色权限三表联查拿到权限的，但是这里简化写死了
         String token = jwtUtil.createJWT(admin.getId(), admin.getLoginname(), "admin");
         Map map = new HashMap();
-        map.put("token",token);
-        map.put("roles","admin");
-        return new Result(true, StatusCode.OK, "登录成功",map);
+        map.put("token", token);
+        map.put("roles", "admin");
+        return new Result(true, StatusCode.OK, "登录成功", map);
+    }
+
+    @PostMapping("/logout")
+    public Result logout() {
+//       String token= (String) request.getAttribute("claims_admin");
+//       if (StringUtils.isBlank(token)){
+//           return new Result(false, StatusCode.ACCESSERROR, "请先登录");
+//       }
+//        HashMap<String, String> objectObjectHashMap = new HashMap<>();
+//        objectObjectHashMap.put("token", token);
+//        return new Result(true, StatusCode.OK, "退出成功", objectObjectHashMap);
+        return new Result(true, StatusCode.OK, "退出成功");
+    }
+
+    @GetMapping("/info")
+    public Result getInfo() {
+        String token = (String) request.getAttribute("claims_admin");
+        if (StringUtils.isBlank(token)) {
+            return new Result(false, StatusCode.ACCESSERROR, "请先登录");
+        }
+        Claims claims = jwtUtil.parseJWT(token);
+        Map<String,Object> map=adminService.getInfo(claims);
+        ArrayList<Object> objects = new ArrayList<>();
+        return new Result(true, StatusCode.OK, "验证成功", map);
     }
 }
