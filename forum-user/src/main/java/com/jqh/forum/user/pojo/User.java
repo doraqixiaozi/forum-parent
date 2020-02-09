@@ -33,4 +33,26 @@ public class User implements Serializable{
 	private Integer fanscount;//粉丝数
 	private Integer followcount;//关注数
 
+	@Override
+	public String toString() {
+		return "User{" +
+				"id='" + id + '\'' +
+				", loginname='" + loginname + '\'' +
+				", mobile='" + mobile + '\'' +
+				", password='" + password + '\'' +
+				", nickname='" + nickname + '\'' +
+				", sex='" + sex + '\'' +
+				", birthday=" + birthday +
+				", avatar='" + avatar + '\'' +
+				", email='" + email + '\'' +
+				", regdate=" + regdate +
+				", updatedate=" + updatedate +
+				", lastdate=" + lastdate +
+				", online=" + online +
+				", interest='" + interest + '\'' +
+				", personality='" + personality + '\'' +
+				", fanscount=" + fanscount +
+				", followcount=" + followcount +
+				'}';
+	}
 }

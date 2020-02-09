@@ -68,61 +68,70 @@ public class RecruitService {
      * @return
      */
     public List<Recruit> findSearch(Map searchMap) {
-
         Example example = new Example(Recruit.class);
+        Example.Criteria criteria = example.createCriteria();
+        makeExample(searchMap, criteria);
+        return recruitMapper.selectByExample(example);
+    }
+
+    /**
+     * 根据查询条件构造条件构造器
+     * @param searchMap 查询条件
+     * @param criteria 条件构造器
+     */
+    private void makeExample(Map searchMap, Example.Criteria criteria) {
         // ID
         if (searchMap.get("id") != null && !"".equals(searchMap.get("id"))) {
-            example.createCriteria().andLike("id", "%" + (String) searchMap.get("id") + "%");
+            criteria.andLike("id", "%" + (String) searchMap.get("id") + "%");
         }
         // 职位名称
         if (searchMap.get("jobname") != null && !"".equals(searchMap.get("jobname"))) {
-            example.createCriteria().andLike("jobname", "%" + (String) searchMap.get("jobname") + "%");
+            criteria.andLike("jobname", "%" + (String) searchMap.get("jobname") + "%");
         }
         // 薪资范围
         if (searchMap.get("salary") != null && !"".equals(searchMap.get("salary"))) {
-            example.createCriteria().andLike("salary", "%" + (String) searchMap.get("salary") + "%");
+            criteria.andLike("salary", "%" + (String) searchMap.get("salary") + "%");
         }
         // 经验要求
         if (searchMap.get("experience") != null && !"".equals(searchMap.get("experience"))) {
-            example.createCriteria().andLike("experience", "%" + (String) searchMap.get("experience") + "%");
+            criteria.andLike("experience", "%" + (String) searchMap.get("experience") + "%");
         }
         // 学历要求
         if (searchMap.get("education") != null && !"".equals(searchMap.get("education"))) {
-            example.createCriteria().andLike("education", "%" + (String) searchMap.get("education") + "%");
+            criteria.andLike("education", "%" + (String) searchMap.get("education") + "%");
         }
         // 任职方式
         if (searchMap.get("type") != null && !"".equals(searchMap.get("type"))) {
-            example.createCriteria().andLike("type", "%" + (String) searchMap.get("type") + "%");
+            criteria.andLike("type", "%" + (String) searchMap.get("type") + "%");
         }
         // 办公地址
         if (searchMap.get("address") != null && !"".equals(searchMap.get("address"))) {
-            example.createCriteria().andLike("address", "%" + (String) searchMap.get("address") + "%");
+            criteria.andLike("address", "%" + (String) searchMap.get("address") + "%");
         }
         // 企业ID
         if (searchMap.get("eid") != null && !"".equals(searchMap.get("eid"))) {
-            example.createCriteria().andLike("eid", "%" + (String) searchMap.get("eid") + "%");
+            criteria.andLike("eid", "%" + (String) searchMap.get("eid") + "%");
         }
         // 状态
         if (searchMap.get("state") != null && !"".equals(searchMap.get("state"))) {
-            example.createCriteria().andLike("state", "%" + (String) searchMap.get("state") + "%");
+            criteria.andLike("state", "%" + (String) searchMap.get("state") + "%");
         }
         // 网址
         if (searchMap.get("url") != null && !"".equals(searchMap.get("url"))) {
-            example.createCriteria().andLike("url", "%" + (String) searchMap.get("url") + "%");
+            criteria.andLike("url", "%" + (String) searchMap.get("url") + "%");
         }
         // 标签
         if (searchMap.get("label") != null && !"".equals(searchMap.get("label"))) {
-            example.createCriteria().andLike("label", "%" + (String) searchMap.get("label") + "%");
+            criteria.andLike("label", "%" + (String) searchMap.get("label") + "%");
         }
         // 职位描述
         if (searchMap.get("content1") != null && !"".equals(searchMap.get("content1"))) {
-            example.createCriteria().andLike("content1", "%" + (String) searchMap.get("content1") + "%");
+            criteria.andLike("content1", "%" + (String) searchMap.get("content1") + "%");
         }
         // 职位要求
         if (searchMap.get("content2") != null && !"".equals(searchMap.get("content2"))) {
-            example.createCriteria().andLike("content2", "%" + (String) searchMap.get("content2") + "%");
+            criteria.andLike("content2", "%" + (String) searchMap.get("content2") + "%");
         }
-        return recruitMapper.selectByExample(example);
     }
 
     /**
@@ -142,6 +151,8 @@ public class RecruitService {
      */
     public void add(Recruit recruit) {
         recruit.setId(idWorker.nextId() + "");
+        recruit.setCreatetime(new Date());
+        log.trace(recruit.toString());
         recruitMapper.insert(recruit);
     }
 
@@ -166,10 +177,11 @@ public class RecruitService {
     //查询推荐职位，按创建时间排序的第一页的6个
     public List<Recruit> selectByState(String state,boolean isEquals) {
         Example example = new Example(Recruit.class);
+        Example.Criteria criteria = example.createCriteria();
         if (isEquals) {
-            example.createCriteria().andEqualTo("state", state);
+            criteria.andEqualTo("state", state);
         }else {
-            example.createCriteria().andNotEqualTo("state", state);
+            criteria.andNotEqualTo("state", state);
         }
         example.setOrderByClause("createtime Desc");
         return recruitMapper.selectByExampleAndRowBounds(example, new RowBounds(0, 6));

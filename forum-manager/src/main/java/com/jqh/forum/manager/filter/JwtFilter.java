@@ -46,7 +46,9 @@ public class JwtFilter extends ZuulFilter {
         if (request.getRequestURI().contains("login")){
             return null;//放行登录的方法
         }
-
+        if (request.getRequestURI().contains("logout")){
+            return null;//放行注销的方法
+        }
         String authorization = request.getHeader("Authorization");
         if (!StringUtils.isBlank(authorization)){
             //如果有相应的头信息存在则放行且进行解析以便其他模块儿使用

@@ -13,6 +13,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.jqh.forum.user.mapper.UserMapper;
 import entity.PageResult;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -171,7 +172,8 @@ public class UserService {
      * @param user
      */
     public void update(User user) {
-        userMapper.updateByPrimaryKey(user);
+        log.trace(user.toString());
+        userMapper.updateByPrimaryKeySelective(user);
     }
 
     /**
@@ -222,6 +224,9 @@ public class UserService {
     public int register(String code, User user) {
         String redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + user.getMobile());
         //如果redis缓存中还未存入此用户手机号所对应的验证码,则说明并未进行验证
+        log.trace(redisCheckCode);
+        log.trace(code);
+        log.trace(user.toString());
         if (StringUtils.isBlank(redisCheckCode)) {
 //            如果手机验证码为空则尝试邮箱验证码
             redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + user.getEmail());
@@ -278,6 +283,7 @@ public class UserService {
         }
         //生成token并返回
         String token = jwtUtil.createJWT(DB_user.getId(), DB_user.getMobile(), "user");
+        map.put("nickname",DB_user.getNickname());
         map.put("token",token);
         //登录成功
         return map;
@@ -301,6 +307,7 @@ public class UserService {
                 token = jwtUtil.createJWT(DB_user.getId(), DB_user.getEmail(), "user");
             }
             map.put("token",token);
+            map.put("nickname",DB_user.getNickname());
             map.put("state",1);
         }else {
             //登录失败
@@ -312,5 +319,12 @@ public class UserService {
     public void updateFanscountAndFollowcount(int num,String userid, String friendid) {
         userMapper.updateFollowcount(num,userid);
         userMapper.updateFanscount(num,friendid);
+    }
+
+    public User getInfo(Claims claims) {
+        String id = claims.getId();
+        User user = userMapper.selectByPrimaryKey(id);
+        user.setPassword(null);
+        return user;
     }
 }

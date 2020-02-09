@@ -3,8 +3,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.apache.bcel.classfile.Module;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import com.jqh.forum.user.pojo.User;
@@ -13,6 +16,8 @@ import com.jqh.forum.user.service.UserService;
 import entity.Result;
 import entity.StatusCode;
 
+import javax.annotation.Resource;
+import javax.annotation.Resources;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -28,8 +33,10 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-	
-	
+	@Autowired
+	private HttpServletRequest request;
+	@Resource
+	private RedisTemplate redisTemplate;
 	/**
 	 * 查询全部数据
 	 * @return
@@ -38,7 +45,13 @@ public class UserController {
 	public Result findAll(){
 		return new Result(true,StatusCode.OK,"查询成功",userService.findAll());
 	}
-	
+
+
+	@RequestMapping(value="/info",method= RequestMethod.GET)
+	public Result getInfo(){
+		Claims claims= (Claims) request.getAttribute("claims_user");
+		return new Result(true,StatusCode.OK,"查询成功",userService.getInfo(claims));
+	}
 	/**
 	 * 根据ID查询
 	 * @param id ID
@@ -48,6 +61,7 @@ public class UserController {
 	public Result findById(@PathVariable String id){
 		return new Result(true,StatusCode.OK,"查询成功",userService.findById(id));
 	}
+
 
 
 	/**
@@ -81,6 +95,15 @@ public class UserController {
 		userService.add(user);
 		return new Result(true,StatusCode.OK,"增加成功");
 	}
+	@RequestMapping(value="/saveinfo",method= RequestMethod.PUT)
+	public Result update(@RequestBody User user){
+        Claims claims = (Claims) request.getAttribute("claims_user");
+		String id = claims.getId();
+		user.setId(id);
+		userService.update(user);
+		return new Result(true,StatusCode.OK,"修改成功");
+	}
+	
 	
 	/**
 	 * 修改
@@ -106,19 +129,35 @@ public class UserController {
 	//发送短信验证码
 	@PostMapping("/sendsms/{mobile}")
 	public Result sendSms(@PathVariable String mobile){
-		userService.sendSms(mobile);
+		String redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + mobile);
+		if (redisCheckCode!=null){
+			return new Result(false,StatusCode.ERROR,"请勿重复发送");
+		}
+		if (!request.getMethod().equals("OPTIONS")){
+			userService.sendSms(mobile);
+		}
 		return new Result(true,StatusCode.OK,"发送成功");
 	}
 
 	//发送邮箱验证码
 	@PostMapping("/sendemail/{email}")
 	public Result sendEmail(@PathVariable String email){
-		userService.sendEmail(email);
+		String redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + email);
+		if (redisCheckCode!=null){
+			return new Result(false,StatusCode.ERROR,"请勿重复发送");
+		}
+		if (!request.getMethod().equals("OPTIONS")){
+			userService.sendEmail(email);
+		}
 		return new Result(true,StatusCode.OK,"发送成功");
 	}
 	//验证码发送成功之后进行用户注册
-	@PostMapping("/register/{code}")
-	public Result register(@PathVariable String code,@RequestBody User user){
+	//使用手机验证码登录
+
+
+
+@PostMapping("/register/{code}")
+public Result register(@PathVariable String code,@RequestBody User user){
 		//0.成功，1.未发送验证码，2.验证码错误
         int flag=userService.register(code,user);
         if (flag==1){
@@ -127,10 +166,8 @@ public class UserController {
 		if (flag==2){
 			return new Result(false, StatusCode.ERROR, "验证码错误");
 		}
-			return new Result(true, StatusCode.OK, "注册成功");
+		return new Result(true, StatusCode.OK, "注册成功");
 	}
-
-	//使用手机验证码登录
 	@PostMapping("/login/{code}")
 	public Result loginByMobile(@PathVariable String code,@RequestBody User user) {
 		//0.成功 1.自动注册并登录 2.未发送验证码 3.验证码错误
@@ -144,6 +181,7 @@ public class UserController {
 		}
 		HashMap<Object, Object> resultMap = new HashMap<>();
 		resultMap.put("token",map.get("token"));
+		resultMap.put("nickname",map.get("nickname"));
 		resultMap.put("roles","user");
 		return new Result(true, StatusCode.OK, "登录成功",resultMap);
 	}
@@ -157,6 +195,7 @@ public class UserController {
 			return new Result(false, StatusCode.LOGINERROR, "登录失败");
 		}
 		HashMap<Object, Object> resultMap = new HashMap<>();
+		resultMap.put("nickname",map.get("nickname"));
 		resultMap.put("token",map.get("token"));
 		resultMap.put("roles","user");
 		return new Result(true, StatusCode.OK, "登录成功",resultMap);

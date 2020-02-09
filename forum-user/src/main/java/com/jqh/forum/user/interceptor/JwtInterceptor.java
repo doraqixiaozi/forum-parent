@@ -34,10 +34,10 @@ public class JwtInterceptor implements HandlerInterceptor {
                     Claims claims = jwtUtil.parseJWT(token);
                     String roles = (String) claims.get("roles");
                     if (roles != null && roles.equals("admin")) {
-                        request.setAttribute("claims_admin",token);//如果是admin
+                        request.setAttribute("claims_admin",token);//如果是admin,写入token
                     }
                     if (roles != null && roles.equals("user")) {
-                        request.setAttribute("claims_user",token);//如果是user
+                        request.setAttribute("claims_user",claims);//如果是user,写入claims
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

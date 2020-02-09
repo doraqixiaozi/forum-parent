@@ -15,4 +15,4 @@ spring:
     name: forum-euraka
 #消息总线需要使用此地址
   rabbitmq:
-    host: 192.168.25.129
+    host: 127.0.0.1

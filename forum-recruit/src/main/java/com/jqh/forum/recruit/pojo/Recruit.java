@@ -30,4 +30,24 @@ public class Recruit implements Serializable {
     private String label;//标签
     private String content1;//职位描述
     private String content2;//职位要求
+
+    @Override
+    public String toString() {
+        return "Recruit{" +
+                "id='" + id + '\'' +
+                ", jobname='" + jobname + '\'' +
+                ", salary='" + salary + '\'' +
+                ", experience='" + experience + '\'' +
+                ", education='" + education + '\'' +
+                ", type='" + type + '\'' +
+                ", address='" + address + '\'' +
+                ", eid='" + eid + '\'' +
+                ", createtime=" + createtime +
+                ", state='" + state + '\'' +
+                ", url='" + url + '\'' +
+                ", label='" + label + '\'' +
+                ", content1='" + content1 + '\'' +
+                ", content2='" + content2 + '\'' +
+                '}';
+    }
 }
