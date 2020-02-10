@@ -27,6 +27,7 @@ public class Problem implements Serializable {
     private Long thumbup;//点赞数
     private Long reply;//回复数
     private String solve;//是否解决
+    private String replyid;//回复人id
     private String replyname;//回复人昵称
     private java.util.Date replytime;//回复日期
 }

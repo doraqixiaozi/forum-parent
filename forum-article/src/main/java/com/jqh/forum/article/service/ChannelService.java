@@ -65,17 +65,18 @@ public class ChannelService {
 	 */
 	public List<Channel> findSearch(Map whereMap) {
 		Example example = new Example(Channel.class);
+		Example.Criteria criteria = example.createCriteria();
 		// ID
 		if (whereMap.get("id")!=null && !"".equals(whereMap.get("id"))) {
-			example.createCriteria().andLike("id","%"+(String)whereMap.get("id")+"%");
+			criteria.andLike("id","%"+(String)whereMap.get("id")+"%");
 		}
 		// 频道名称
 		if (whereMap.get("name")!=null && !"".equals(whereMap.get("name"))) {
-			example.createCriteria().andLike("name","%"+(String)whereMap.get("name")+"%");
+			criteria.andLike("name","%"+(String)whereMap.get("name")+"%");
 		}
 		// 状态
 		if (whereMap.get("state")!=null && !"".equals(whereMap.get("state"))) {
-			example.createCriteria().andLike("state","%"+(String)whereMap.get("state")+"%");
+			criteria.andLike("state","%"+(String)whereMap.get("state")+"%");
 		}
 
 		return channelMapper.selectByExample(example);

@@ -1,11 +1,13 @@
 package com.jqh.forum.qa.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.jqh.forum.qa.mapper.ProblemMapper;
 import com.jqh.forum.qa.mapper.ReplyMapper;
 import com.jqh.forum.qa.pojo.Problem;
 import entity.PageResult;
@@ -30,6 +32,8 @@ public class ReplyService {
 
 	@Resource
 	private ReplyMapper replyMapper;
+	@Resource
+	private ProblemMapper problemMapper;
 	
 	@Autowired
 	private IdWorker idWorker;
@@ -65,25 +69,26 @@ public class ReplyService {
 	 */
 	public List<Reply> findSearch(Map whereMap) {
 		Example example = new Example(Problem.class);
+		Example.Criteria criteria = example.createCriteria();
 		// 编号
 		if (whereMap.get("id")!=null && !"".equals(whereMap.get("id"))) {
-			example.createCriteria().andLike("id","%"+(String)whereMap.get("id")+"%");
+			criteria.andLike("id","%"+(String)whereMap.get("id")+"%");
 		}
 		// 问题ID
 		if (whereMap.get("problemid")!=null && !"".equals(whereMap.get("problemid"))) {
-			example.createCriteria().andLike("problemid","%"+(String)whereMap.get("problemid")+"%");
+			criteria.andLike("problemid","%"+(String)whereMap.get("problemid")+"%");
 		}
 		// 回答内容
 		if (whereMap.get("content")!=null && !"".equals(whereMap.get("content"))) {
-			example.createCriteria().andLike("content","%"+(String)whereMap.get("content")+"%");
+			criteria.andLike("content","%"+(String)whereMap.get("content")+"%");
 		}
 		// 回答人ID
 		if (whereMap.get("userid")!=null && !"".equals(whereMap.get("userid"))) {
-			example.createCriteria().andLike("userid","%"+(String)whereMap.get("userid")+"%");
+			criteria.andLike("userid","%"+(String)whereMap.get("userid")+"%");
 		}
 		// 回答人昵称
 		if (whereMap.get("nickname")!=null && !"".equals(whereMap.get("nickname"))) {
-			example.createCriteria().andLike("nickname","%"+(String)whereMap.get("nickname")+"%");
+			criteria.andLike("nickname","%"+(String)whereMap.get("nickname")+"%");
 		}
 		return replyMapper.selectByExample(example);
 	}
@@ -98,12 +103,16 @@ public class ReplyService {
 	}
 
 	/**
-	 * 增加
+	 * 增加(顺带更新problem的回答数)
 	 * @param reply
 	 */
 	public void add(Reply reply) {
 		reply.setId( idWorker.nextId()+"" );
 		replyMapper.insert(reply);
+		Problem problem = problemMapper.selectByPrimaryKey(reply.getProblemid());
+		problem.setUpdatetime(new Date());
+		problem.setReply(problem.getReply()+1);
+		problemMapper.updateByPrimaryKeySelective(problem);
 	}
 
 	/**

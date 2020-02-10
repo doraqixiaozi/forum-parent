@@ -68,41 +68,42 @@ public class EnterpriseService {
      */
     public List<Enterprise> findSearch(Map whereMap) {
         Example example = new Example(Enterprise.class);
+        Example.Criteria criteria = example.createCriteria();
         // ID
         if (whereMap.get("id") != null && !"".equals(whereMap.get("id"))) {
-            example.createCriteria().andLike("id", "%" + (String) whereMap.get("id") + "%");
+            criteria.andLike("id", "%" + (String) whereMap.get("id") + "%");
         }
         // 企业名称
         if (whereMap.get("name") != null && !"".equals(whereMap.get("name"))) {
-            example.createCriteria().andLike("name", "%" + (String) whereMap.get("name") + "%");
+            criteria.andLike("name", "%" + (String) whereMap.get("name") + "%");
         }
         // 企业简介
         if (whereMap.get("summary") != null && !"".equals(whereMap.get("summary"))) {
-            example.createCriteria().andLike("summary", "%" + (String) whereMap.get("summary") + "%");
+            criteria.andLike("summary", "%" + (String) whereMap.get("summary") + "%");
         }
         // 企业地址
         if (whereMap.get("address") != null && !"".equals(whereMap.get("address"))) {
-            example.createCriteria().andLike("address", "%" + (String) whereMap.get("address") + "%");
+            criteria.andLike("address", "%" + (String) whereMap.get("address") + "%");
         }
         // 标签列表
         if (whereMap.get("labels") != null && !"".equals(whereMap.get("labels"))) {
-            example.createCriteria().andLike("labels", "%" + (String) whereMap.get("labels") + "%");
+            criteria.andLike("labels", "%" + (String) whereMap.get("labels") + "%");
         }
         // 坐标
         if (whereMap.get("coordinate") != null && !"".equals(whereMap.get("coordinate"))) {
-            example.createCriteria().andLike("coordinate", "%" + (String) whereMap.get("coordinate") + "%");
+            criteria.andLike("coordinate", "%" + (String) whereMap.get("coordinate") + "%");
         }
         // 是否热门
         if (whereMap.get("ishot") != null && !"".equals(whereMap.get("ishot"))) {
-            example.createCriteria().andLike("ishot", "%" + (String) whereMap.get("ishot") + "%");
+            criteria.andLike("ishot", "%" + (String) whereMap.get("ishot") + "%");
         }
         // LOGO
         if (whereMap.get("logo") != null && !"".equals(whereMap.get("logo"))) {
-            example.createCriteria().andLike("logo", "%" + (String) whereMap.get("logo") + "%");
+            criteria.andLike("logo", "%" + (String) whereMap.get("logo") + "%");
         }
         // URL
         if (whereMap.get("url") != null && !"".equals(whereMap.get("url"))) {
-            example.createCriteria().andLike("url", "%" + (String) whereMap.get("url") + "%");
+            criteria.andLike("url", "%" + (String) whereMap.get("url") + "%");
         }
         return enterpriseMapper.selectByExample(example);
     }

@@ -63,16 +63,16 @@ public class LabelService {
 
     public List<Label> findByCondition(Label label) {
         Example example = new Example(Label.class);
-//        example.createCriteria().andEqualTo(label);
+        Example.Criteria criteria = example.createCriteria();
 
         if (StringUtil.isNotEmpty(label.getId())){
-            example.createCriteria().andEqualTo("id",label.getId());
+            criteria.andEqualTo("id",label.getId());
         }
         if (StringUtil.isNotEmpty(label.getLabelname())){
-            example.createCriteria().andLike("labelname","%"+label.getLabelname()+"%");
+            criteria.andLike("labelname","%"+label.getLabelname()+"%");
         }
         if (StringUtil.isNotEmpty(label.getState())){
-            example.createCriteria().andEqualTo("state",label.getState());
+            criteria.andEqualTo("state",label.getState());
         }
         System.out.println(example.getOredCriteria());
         List<Label> list = labelMapper.selectByExample(example);

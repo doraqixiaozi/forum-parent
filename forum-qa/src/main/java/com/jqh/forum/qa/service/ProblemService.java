@@ -1,11 +1,14 @@
 package com.jqh.forum.qa.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.jqh.forum.qa.mapper.ProblemMapper;
+import com.jqh.forum.qa.mapper.ReplyMapper;
+import com.jqh.forum.qa.pojo.Reply;
 import entity.PageResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +32,8 @@ public class ProblemService {
 
     @Resource
     private ProblemMapper problemMapper;
-
+    @Resource
+    private ReplyMapper replyMapper;
     @Autowired
     private IdWorker idWorker;
     @Autowired
@@ -69,33 +73,34 @@ public class ProblemService {
      */
     public List<Problem> findSearch(Map searchMap) {
         Example example = new Example(Problem.class);
+        Example.Criteria criteria = example.createCriteria();
         // ID
         if (searchMap.get("id") != null && !"".equals(searchMap.get("id"))) {
-            example.createCriteria().andLike("id", "%" + (String) searchMap.get("id") + "%");
+            criteria.andLike("id", "%" + (String) searchMap.get("id") + "%");
         }
         // 标题
         if (searchMap.get("title") != null && !"".equals(searchMap.get("title"))) {
-            example.createCriteria().andLike("title", "%" + (String) searchMap.get("title") + "%");
+            criteria.andLike("title", "%" + (String) searchMap.get("title") + "%");
         }
         // 内容
         if (searchMap.get("content") != null && !"".equals(searchMap.get("content"))) {
-            example.createCriteria().andLike("content", "%" + (String) searchMap.get("content") + "%");
+            criteria.andLike("content", "%" + (String) searchMap.get("content") + "%");
         }
         // 用户ID
         if (searchMap.get("userid") != null && !"".equals(searchMap.get("userid"))) {
-            example.createCriteria().andLike("userid", "%" + (String) searchMap.get("userid") + "%");
+            criteria.andLike("userid", "%" + (String) searchMap.get("userid") + "%");
         }
         // 昵称
         if (searchMap.get("nickname") != null && !"".equals(searchMap.get("nickname"))) {
-            example.createCriteria().andLike("nickname", "%" + (String) searchMap.get("nickname") + "%");
+            criteria.andLike("nickname", "%" + (String) searchMap.get("nickname") + "%");
         }
         // 是否解决
         if (searchMap.get("solve") != null && !"".equals(searchMap.get("solve"))) {
-            example.createCriteria().andLike("solve", "%" + (String) searchMap.get("solve") + "%");
+            criteria.andLike("solve", "%" + (String) searchMap.get("solve") + "%");
         }
         // 回复人昵称
         if (searchMap.get("replyname") != null && !"".equals(searchMap.get("replyname"))) {
-            example.createCriteria().andLike("replyname", "%" + (String) searchMap.get("replyname") + "%");
+            criteria.andLike("replyname", "%" + (String) searchMap.get("replyname") + "%");
         }
         return problemMapper.selectByExample(example);
     }
@@ -116,11 +121,17 @@ public class ProblemService {
      * @param problem
      */
     public void add(Problem problem) {
-        String token= (String) request.getAttribute("claims_user");
-        if (StringUtils.isBlank(token)){
+        String token = (String) request.getAttribute("claims_user");
+        if (StringUtils.isBlank(token)) {
             throw new RuntimeException("权限不足");
         }
         problem.setId(idWorker.nextId() + "");
+        problem.setUpdatetime(new Date());
+        problem.setCreatetime(new Date());
+        problem.setReply((long)0);
+        problem.setThumbup((long)0);
+        problem.setSolve("0");
+        problem.setVisits((long)0);
         problemMapper.insert(problem);
     }
 
@@ -161,5 +172,30 @@ public class ProblemService {
         Page<Problem> problems = PageHelper.startPage(page, size);
         List<Problem> newlist = problemMapper.waitlist(lableid);
         return new PageResult(problems.getTotal(), newlist);
+    }
+
+    /**
+     * 设置某个问题为已解决
+     *
+     * @param problemId
+     * @param replyId
+     */
+    public void solve(String problemId, String replyId) {
+        Problem problem = problemMapper.selectByPrimaryKey(problemId);
+        Reply reply = replyMapper.selectByPrimaryKey(replyId);
+        problem.setSolve("1");
+        problem.setReplyid(replyId);
+        problem.setUpdatetime(new Date());
+        problem.setReplyname(reply.getNickname());
+        problem.setReplytime(reply.getCreatetime());
+        problemMapper.updateByPrimaryKeySelective(problem);
+    }
+
+    /**
+     * 点赞
+     * @param problemId
+     */
+    public void addThumbup(String problemId) {
+        problemMapper.addThumbup(problemId);
     }
 }

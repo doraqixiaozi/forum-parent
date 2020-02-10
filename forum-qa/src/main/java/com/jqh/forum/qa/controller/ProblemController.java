@@ -115,18 +115,60 @@ public class ProblemController {
         return new Result(true, StatusCode.OK, "删除成功");
     }
 
+    /**
+     * 最新问题
+     * @param lableid
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("/newlist/{labelid}/{page}/{size}")
     public Result newlist(@PathVariable("labelid") String lableid, @PathVariable("page") int page, @PathVariable("size") int size) {
         return new Result(true, StatusCode.OK, "查询成功", problemService.newlist(lableid, page, size));
     }
-
+    /**
+     * 最热问题
+     * @param lableid
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("/hotlist/{labelid}/{page}/{size}")
     public Result hotlist(@PathVariable("labelid") String lableid, @PathVariable("page") int page, @PathVariable("size") int size) {
         return new Result(true, StatusCode.OK, "查询成功", problemService.hotlist(lableid, page, size));
     }
-
+    /**
+     * 待回答问题
+     * @param lableid
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("/waitlist/{labelid}/{page}/{size}")
     public Result waitlist(@PathVariable("labelid") String lableid, @PathVariable("page") int page, @PathVariable("size") int size) {
-        return new Result(true, StatusCode.OK, "查询成功", problemService.hotlist(lableid, page, size));
+        return new Result(true, StatusCode.OK, "查询成功", problemService.waitlist(lableid, page, size));
+    }
+
+    /**
+     * 设置问题为已解决（设置某个回答为正确回答）
+     * @param problemId
+     * @param replyId
+     * @return
+     */
+    @PutMapping("/solve/{problemId}/{replyId}")
+    public Result solve(@PathVariable("problemId") String problemId,@PathVariable("replyId") String replyId) {
+        problemService.solve(problemId, replyId);
+        return new Result(true, StatusCode.OK, "设置问题解决成功" );
+    }
+
+    /**
+     * 点赞
+     * @param problemId
+     * @return
+     */
+    @PutMapping("/thumbup/{problemId}")
+    public Result thumbup(@PathVariable String problemId){
+        problemService.addThumbup(problemId);
+        return new Result(true,StatusCode.OK,"点赞成功");
     }
 }

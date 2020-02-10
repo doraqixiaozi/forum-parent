@@ -72,53 +72,54 @@ public class ArticleService {
      */
     public List<Article> findSearch(Map whereMap) {
         Example example = new Example(Article.class);
+        Example.Criteria criteria = example.createCriteria();
         // ID
         if (whereMap.get("id") != null && !"".equals(whereMap.get("id"))) {
-            example.createCriteria().andLike("id", "%" + (String) whereMap.get("id") + "%");
+            criteria.andLike("id", "%" + (String) whereMap.get("id") + "%");
         }
         // 专栏ID
         if (whereMap.get("columnid") != null && !"".equals(whereMap.get("columnid"))) {
-            example.createCriteria().andLike("columnid", "%" + (String) whereMap.get("columnid") + "%");
+            criteria.andLike("columnid", "%" + (String) whereMap.get("columnid") + "%");
         }
         // 用户ID
         if (whereMap.get("userid") != null && !"".equals(whereMap.get("userid"))) {
-            example.createCriteria().andLike("userid", "%" + (String) whereMap.get("userid") + "%");
+            criteria.andLike("userid", "%" + (String) whereMap.get("userid") + "%");
         }
         // 标题
         if (whereMap.get("title") != null && !"".equals(whereMap.get("title"))) {
-            example.createCriteria().andLike("title", "%" + (String) whereMap.get("title") + "%");
+            criteria.andLike("title", "%" + (String) whereMap.get("title") + "%");
         }
         // 文章正文
         if (whereMap.get("content") != null && !"".equals(whereMap.get("content"))) {
-            example.createCriteria().andLike("content", "%" + (String) whereMap.get("content") + "%");
+            criteria.andLike("content", "%" + (String) whereMap.get("content") + "%");
         }
         // 文章封面
         if (whereMap.get("image") != null && !"".equals(whereMap.get("image"))) {
-            example.createCriteria().andLike("image", "%" + (String) whereMap.get("image") + "%");
+            criteria.andLike("image", "%" + (String) whereMap.get("image") + "%");
         }
         // 是否公开
         if (whereMap.get("ispublic") != null && !"".equals(whereMap.get("ispublic"))) {
-            example.createCriteria().andLike("ispublic", "%" + (String) whereMap.get("ispublic") + "%");
+            criteria.andLike("ispublic", "%" + (String) whereMap.get("ispublic") + "%");
         }
         // 是否置顶
         if (whereMap.get("istop") != null && !"".equals(whereMap.get("istop"))) {
-            example.createCriteria().andLike("istop", "%" + (String) whereMap.get("istop") + "%");
+            criteria.andLike("istop", "%" + (String) whereMap.get("istop") + "%");
         }
         // 审核状态（这个原来叫condition）
         if (whereMap.get("state") != null && !"".equals(whereMap.get("state"))) {
-            example.createCriteria().andLike("state", "%" + (String) whereMap.get("state") + "%");
+            criteria.andLike("state", "%" + (String) whereMap.get("state") + "%");
         }
         // 所属频道
         if (whereMap.get("channelid") != null && !"".equals(whereMap.get("channelid"))) {
-            example.createCriteria().andLike("channelid", "%" + (String) whereMap.get("channelid") + "%");
+            criteria.andLike("channelid", "%" + (String) whereMap.get("channelid") + "%");
         }
         // URL
         if (whereMap.get("url") != null && !"".equals(whereMap.get("url"))) {
-            example.createCriteria().andLike("url", "%" + (String) whereMap.get("url") + "%");
+            criteria.andLike("url", "%" + (String) whereMap.get("url") + "%");
         }
         // 类型
         if (whereMap.get("type") != null && !"".equals(whereMap.get("type"))) {
-            example.createCriteria().andLike("type", "%" + (String) whereMap.get("type") + "%");
+            criteria.andLike("type", "%" + (String) whereMap.get("type") + "%");
         }
         return articleMapper.selectByExample(example);
     }
@@ -130,11 +131,11 @@ public class ArticleService {
      * @return
      */
     public Article findById(String id) {
-        Article article=(Article)redisTemplate.opsForValue().get("article_" + id);
+        Article article=(Article)redisTemplate.opsForValue().get("article:::" + id);
         if (article==null){
             article=articleMapper.selectByPrimaryKey(id);
-            log.trace("article not in it");
-            redisTemplate.opsForValue().set("article_"+id,article);
+            log.trace("article not in redis");
+            redisTemplate.opsForValue().set("article:::"+id,article);
         }
         return article;
     }
@@ -156,7 +157,7 @@ public class ArticleService {
      */
     public void update(Article article) {
         articleMapper.updateByPrimaryKey(article);
-        redisTemplate.delete("article_"+article.getId());
+        redisTemplate.delete("article:::"+article.getId());
     }
 
     /**
@@ -166,7 +167,7 @@ public class ArticleService {
      */
     public void deleteById(String id) {
         articleMapper.deleteByPrimaryKey(id);
-        redisTemplate.delete("article_"+id);
+        redisTemplate.delete("article:::"+id);
     }
 
     //审核通过

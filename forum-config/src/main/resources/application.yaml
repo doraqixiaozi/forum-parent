@@ -11,7 +11,7 @@ spring:
           uri: https://gitee.com/doraqixiaozi/forum.git
 #消息总线需要使用此地址
   rabbitmq:
-    host: 192.168.25.129
+    host: 127.0.0.1
 #    暴露触发消息总线的地址
 management:
   endpoints:

@@ -24,6 +24,15 @@
                 <!--剔除过滤器-->
                 <filtering>false</filtering>
             </resource>
+            <resource>
+                <!--目标资源文件夹-->
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>*.yaml</include>
+                </includes>
+                <!--剔除过滤器-->
+                <filtering>false</filtering>
+            </resource>
         </resources>
         <plugins>
             <plugin>

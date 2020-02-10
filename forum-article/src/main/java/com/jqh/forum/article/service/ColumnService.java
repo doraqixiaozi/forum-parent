@@ -69,25 +69,26 @@ public class ColumnService {
 	 */
 	public List<Column> findSearch(Map whereMap) {
 		Example example = new Example(Column.class);
+		Example.Criteria criteria = example.createCriteria();
 		// ID
 		if (whereMap.get("id")!=null && !"".equals(whereMap.get("id"))) {
-			example.createCriteria().andLike("id","%"+(String)whereMap.get("id")+"%");
+			criteria.andLike("id","%"+(String)whereMap.get("id")+"%");
 		}
 		// 专栏名称
 		if (whereMap.get("name")!=null && !"".equals(whereMap.get("name"))) {
-			example.createCriteria().andLike("name","%"+(String)whereMap.get("name")+"%");
+			criteria.andLike("name","%"+(String)whereMap.get("name")+"%");
 		}
 		// 专栏简介
 		if (whereMap.get("summary")!=null && !"".equals(whereMap.get("summary"))) {
-			example.createCriteria().andLike("summary","%"+(String)whereMap.get("summary")+"%");
+			criteria.andLike("summary","%"+(String)whereMap.get("summary")+"%");
 		}
 		// 用户ID
 		if (whereMap.get("userid")!=null && !"".equals(whereMap.get("userid"))) {
-			example.createCriteria().andLike("userid","%"+(String)whereMap.get("userid")+"%");
+			criteria.andLike("userid","%"+(String)whereMap.get("userid")+"%");
 		}
 		// 状态
 		if (whereMap.get("state")!=null && !"".equals(whereMap.get("state"))) {
-			example.createCriteria().andLike("state","%"+(String)whereMap.get("state")+"%");
+			criteria.andLike("state","%"+(String)whereMap.get("state")+"%");
 		}
 
 		return columnMapper.selectByExample(example);
