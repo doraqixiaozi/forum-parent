@@ -77,21 +77,22 @@ public class AdminService {
      */
     public List<Admin> findSearch(Map whereMap) {
         Example example = new Example(Admin.class);
+        Example.Criteria criteria = example.createCriteria();
         // ID
         if (whereMap.get("id") != null && !"".equals(whereMap.get("id"))) {
-            example.createCriteria().andLike("id", "%" + (String) whereMap.get("id") + "%");
+            criteria.andLike("id", "%" + (String) whereMap.get("id") + "%");
         }
         // 登陆名称
         if (whereMap.get("loginname") != null && !"".equals(whereMap.get("loginname"))) {
-            example.createCriteria().andLike("loginname", "%" + (String) whereMap.get("loginname") + "%");
+            criteria.andLike("loginname", "%" + (String) whereMap.get("loginname") + "%");
         }
         // 密码
         if (whereMap.get("password") != null && !"".equals(whereMap.get("password"))) {
-            example.createCriteria().andLike("password", "%" + (String) whereMap.get("password") + "%");
+            criteria.andLike("password", "%" + (String) whereMap.get("password") + "%");
         }
         // 状态
         if (whereMap.get("state") != null && !"".equals(whereMap.get("state"))) {
-            example.createCriteria().andLike("state", "%" + (String) whereMap.get("state") + "%");
+            criteria.andLike("state", "%" + (String) whereMap.get("state") + "%");
         }
         return adminMapper.selectByExample(example);
     }
@@ -138,7 +139,8 @@ public class AdminService {
 
     public Admin login(Admin admin) {
         Example example = new Example(Admin.class);
-        example.createCriteria().andEqualTo("loginname", admin.getLoginname());
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("loginname", admin.getLoginname());
         Admin DB_admin = adminMapper.selectOneByExample(example);
         if (DB_admin != null && encoder.matches(admin.getPassword(), DB_admin.getPassword())) {
             return DB_admin;

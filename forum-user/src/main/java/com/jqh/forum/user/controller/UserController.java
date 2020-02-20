@@ -133,6 +133,7 @@ public class UserController {
 		if (redisCheckCode!=null){
 			return new Result(false,StatusCode.ERROR,"请勿重复发送");
 		}
+		//前端在发送请求时会有一个多余的options方法，这里过滤掉
 		if (!request.getMethod().equals("OPTIONS")){
 			userService.sendSms(mobile);
 		}
@@ -146,6 +147,7 @@ public class UserController {
 		if (redisCheckCode!=null){
 			return new Result(false,StatusCode.ERROR,"请勿重复发送");
 		}
+		//前端在发送请求时会有一个多余的options方法，这里过滤掉
 		if (!request.getMethod().equals("OPTIONS")){
 			userService.sendEmail(email);
 		}
@@ -183,6 +185,7 @@ public Result register(@PathVariable String code,@RequestBody User user){
 		resultMap.put("token",map.get("token"));
 		resultMap.put("nickname",map.get("nickname"));
 		resultMap.put("roles","user");
+		resultMap.put("id",map.get("id"));
 		return new Result(true, StatusCode.OK, "登录成功",resultMap);
 	}
 
@@ -198,6 +201,7 @@ public Result register(@PathVariable String code,@RequestBody User user){
 		resultMap.put("nickname",map.get("nickname"));
 		resultMap.put("token",map.get("token"));
 		resultMap.put("roles","user");
+		resultMap.put("id",map.get("id"));
 		return new Result(true, StatusCode.OK, "登录成功",resultMap);
 	}
 

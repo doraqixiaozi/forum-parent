@@ -89,45 +89,46 @@ public class UserService {
      */
     public List<User> findSearch(Map searchMap) {
         Example example = new Example(User.class);
+        Example.Criteria criteria = example.createCriteria();
         // ID
         if (searchMap.get("id") != null && !"".equals(searchMap.get("id"))) {
-            example.createCriteria().andLike("id", "%" + (String) searchMap.get("id") + "%");
+            criteria.andLike("id", "%" + (String) searchMap.get("id") + "%");
         }
         // 登陆名称
         if (searchMap.get("loginname") != null && !"".equals(searchMap.get("loginname"))) {
-            example.createCriteria().andLike("loginname", "%" + (String) searchMap.get("loginname") + "%");
+            criteria.andLike("loginname", "%" + (String) searchMap.get("loginname") + "%");
         }
         // 手机号
         if (searchMap.get("mobile") != null && !"".equals(searchMap.get("mobile"))) {
-            example.createCriteria().andLike("mobile", "%" + (String) searchMap.get("mobile") + "%");
+            criteria.andLike("mobile", "%" + (String) searchMap.get("mobile") + "%");
         }
         // 密码
         if (searchMap.get("password") != null && !"".equals(searchMap.get("password"))) {
-            example.createCriteria().andLike("password", "%" + (String) searchMap.get("password") + "%");
+            criteria.andLike("password", "%" + (String) searchMap.get("password") + "%");
         }
         // 昵称
         if (searchMap.get("nickname") != null && !"".equals(searchMap.get("nickname"))) {
-            example.createCriteria().andLike("nickname", "%" + (String) searchMap.get("nickname") + "%");
+            criteria.andLike("nickname", "%" + (String) searchMap.get("nickname") + "%");
         }
         // 性别
         if (searchMap.get("sex") != null && !"".equals(searchMap.get("sex"))) {
-            example.createCriteria().andLike("sex", "%" + (String) searchMap.get("sex") + "%");
+            criteria.andLike("sex", "%" + (String) searchMap.get("sex") + "%");
         }
         // 头像
         if (searchMap.get("avatar") != null && !"".equals(searchMap.get("avatar"))) {
-            example.createCriteria().andLike("avatar", "%" + (String) searchMap.get("avatar") + "%");
+            criteria.andLike("avatar", "%" + (String) searchMap.get("avatar") + "%");
         }
         // E-Mail
         if (searchMap.get("email") != null && !"".equals(searchMap.get("email"))) {
-            example.createCriteria().andLike("email", "%" + (String) searchMap.get("email") + "%");
+            criteria.andLike("email", "%" + (String) searchMap.get("email") + "%");
         }
         // 兴趣
         if (searchMap.get("interest") != null && !"".equals(searchMap.get("interest"))) {
-            example.createCriteria().andLike("interest", "%" + (String) searchMap.get("interest") + "%");
+            criteria.andLike("interest", "%" + (String) searchMap.get("interest") + "%");
         }
         // 个性
         if (searchMap.get("personality") != null && !"".equals(searchMap.get("personality"))) {
-            example.createCriteria().andLike("personality", "%" + (String) searchMap.get("personality") + "%");
+            criteria.andLike("personality", "%" + (String) searchMap.get("personality") + "%");
         }
         return userMapper.selectByExample(example);
     }
@@ -271,7 +272,8 @@ public class UserService {
         }
         //如果验证码正确，则从数据库查询用户信息
         Example example = new Example(User.class);
-        example.createCriteria().andEqualTo("mobile", user.getMobile());
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("mobile", user.getMobile());
         User DB_user = userMapper.selectOneByExample(example);
         //如果不存在此用户，则说明未注册，自动帮其生成密码并注册
         if (DB_user == null) {
@@ -284,6 +286,7 @@ public class UserService {
         //生成token并返回
         String token = jwtUtil.createJWT(DB_user.getId(), DB_user.getMobile(), "user");
         map.put("nickname",DB_user.getNickname());
+        map.put("id",DB_user.getId());
         map.put("token",token);
         //登录成功
         return map;
@@ -292,7 +295,8 @@ public class UserService {
     public Map<String, Object> loginByPassword(User user) {
         HashMap<String, Object> map = new HashMap<>();
         Example example = new Example(User.class);
-        example.createCriteria().orEqualTo("loginname", user.getLoginname()).orEqualTo("mobile", user.getMobile()).orEqualTo("email", user.getEmail());
+        Example.Criteria criteria = example.createCriteria();
+        criteria.orEqualTo("loginname", user.getLoginname()).orEqualTo("mobile", user.getMobile()).orEqualTo("email", user.getEmail());
         User DB_user = userMapper.selectOneByExample(example);
         if (DB_user != null && encoder.matches(user.getPassword(), DB_user.getPassword())) {
             //登录成功
@@ -308,6 +312,7 @@ public class UserService {
             }
             map.put("token",token);
             map.put("nickname",DB_user.getNickname());
+            map.put("id",DB_user.getId());
             map.put("state",1);
         }else {
             //登录失败

@@ -1,4 +1,5 @@
-package com.jqh.forum.friend.interceptor;
+package com.jqh.forum.spit.interceptor;
+
 
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import util.JwtUtil;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
-    @Autowired
+    @Resource
     private JwtUtil jwtUtil;
 
     @Override

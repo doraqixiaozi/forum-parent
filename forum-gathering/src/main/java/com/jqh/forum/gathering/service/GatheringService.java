@@ -65,41 +65,42 @@ public class GatheringService {
 	 */
 	public List<Gathering> findSearch(Map searchMap) {
 		Example example = new Example(Gathering.class);
+		Example.Criteria criteria = example.createCriteria();
 		// 编号
 		if (searchMap.get("id")!=null && !"".equals(searchMap.get("id"))) {
-			example.createCriteria().andLike("id","%"+(String)searchMap.get("id")+"%");
+			criteria.andLike("id","%"+(String)searchMap.get("id")+"%");
 		}
 		// 活动名称
 		if (searchMap.get("name")!=null && !"".equals(searchMap.get("name"))) {
-			example.createCriteria().andLike("name","%"+(String)searchMap.get("name")+"%");
+			criteria.andLike("name","%"+(String)searchMap.get("name")+"%");
 		}
 		// 大会简介
 		if (searchMap.get("summary")!=null && !"".equals(searchMap.get("summary"))) {
-			example.createCriteria().andLike("summary","%"+(String)searchMap.get("summary")+"%");
+			criteria.andLike("summary","%"+(String)searchMap.get("summary")+"%");
 		}
 		// 详细说明
 		if (searchMap.get("detail")!=null && !"".equals(searchMap.get("detail"))) {
-			example.createCriteria().andLike("detail","%"+(String)searchMap.get("detail")+"%");
+			criteria.andLike("detail","%"+(String)searchMap.get("detail")+"%");
 		}
 		// 主办方
 		if (searchMap.get("sponsor")!=null && !"".equals(searchMap.get("sponsor"))) {
-			example.createCriteria().andLike("sponsor","%"+(String)searchMap.get("sponsor")+"%");
+			criteria.andLike("sponsor","%"+(String)searchMap.get("sponsor")+"%");
 		}
 		// 活动图片
 		if (searchMap.get("image")!=null && !"".equals(searchMap.get("image"))) {
-			example.createCriteria().andLike("image","%"+(String)searchMap.get("image")+"%");
+			criteria.andLike("image","%"+(String)searchMap.get("image")+"%");
 		}
 		// 举办地点
 		if (searchMap.get("address")!=null && !"".equals(searchMap.get("address"))) {
-			example.createCriteria().andLike("address","%"+(String)searchMap.get("address")+"%");
+			criteria.andLike("address","%"+(String)searchMap.get("address")+"%");
 		}
 		// 是否可见
 		if (searchMap.get("state")!=null && !"".equals(searchMap.get("state"))) {
-			example.createCriteria().andLike("state","%"+(String)searchMap.get("state")+"%");
+			criteria.andLike("state","%"+(String)searchMap.get("state")+"%");
 		}
 		// 城市
 		if (searchMap.get("city")!=null && !"".equals(searchMap.get("city"))) {
-			example.createCriteria().andLike("city","%"+(String)searchMap.get("city")+"%");
+			criteria.andLike("city","%"+(String)searchMap.get("city")+"%");
 		}
 		return gatheringMapper.selectByExample(example);
 	}

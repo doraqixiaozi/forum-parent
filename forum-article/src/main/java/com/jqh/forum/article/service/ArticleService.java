@@ -134,7 +134,6 @@ public class ArticleService {
         Article article=(Article)redisTemplate.opsForValue().get("article:::" + id);
         if (article==null){
             article=articleMapper.selectByPrimaryKey(id);
-            log.trace("article not in redis");
             redisTemplate.opsForValue().set("article:::"+id,article);
         }
         return article;

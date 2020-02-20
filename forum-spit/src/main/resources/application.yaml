@@ -5,13 +5,13 @@ spring:
     name: forum-spit
   data:
     mongodb:
-      host: 192.168.25.129
+      host: 127.0.0.1
       database: spitdb
   redis:
-    host: 192.168.25.129
+    host: 127.0.0.1
   #消息总线需要使用此地址
   rabbitmq:
-    host: 192.168.25.129
+    host: 127.0.0.1
 logging:
   level:
     #    可以细分到每个包的日志级别
@@ -48,3 +48,7 @@ hystrix:
         sleepWindowInMilliseconds: 4000
         #        错误率，默认50%
         errorThresholdPercentage: 60
+jwt:
+  config:
+    key: jqh
+    ttl: 259200000

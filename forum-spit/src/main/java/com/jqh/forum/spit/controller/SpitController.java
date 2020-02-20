@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: 几米
@@ -108,6 +107,7 @@ public class SpitController {
 
     @PutMapping("/thumbup/{spitId}")
     public Result thumbup(@PathVariable String spitId) {
+        //用redis控制用户不能重复点赞
         //假设用户id为
         String userid="1111";
         Object o = redisTemplate.opsForValue().get("thumbup_" + userid + "_" + spitId);
@@ -116,6 +116,7 @@ public class SpitController {
         }
         spitService.thumbup(spitId);
         redisTemplate.opsForValue().set("thumbup_" + userid + "_" + spitId,1);
+        redisTemplate.expire("thumbup_" + userid + "_" + spitId,7, TimeUnit.DAYS);
         return new Result(true, StatusCode.OK, "点赞成功");
     }
 }
