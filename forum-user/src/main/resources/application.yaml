@@ -6,12 +6,12 @@ spring:
   datasource:
     username: root
     password: password
-    url: jdbc:mysql://192.168.25.129:3306/forum_user?useSSL=false&serverTimezone=Hongkong&characterEncoding=utf-8&autoReconnect=true
+    url: jdbc:mysql://127.0.0.1:3306/forum_user?useSSL=false&serverTimezone=Hongkong&characterEncoding=utf-8&autoReconnect=true
     type: com.zaxxer.hikari.HikariDataSource
   rabbitmq:
-    host: 192.168.25.129
+    host: 127.0.0.1
   redis:
-    host: 192.168.25.129
+    host: 127.0.0.1
 mybatis:
   type-aliases-package: com.jqh.forum.user.pojo
 logging:

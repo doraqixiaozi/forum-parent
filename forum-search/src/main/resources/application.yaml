@@ -6,10 +6,11 @@ spring:
 #    配置elasticsearch地址
   data:
     elasticsearch:
-      cluster-nodes: 192.168.25.129:9300
+      cluster-nodes: 127.0.0.1:9300
+      cluster-name: docker-cluster
   #消息总线需要使用此地址
   rabbitmq:
-    host: 192.168.25.129
+    host: 127.0.0.1
 logging:
   level:
     #    可以细分到每个包的日志级别

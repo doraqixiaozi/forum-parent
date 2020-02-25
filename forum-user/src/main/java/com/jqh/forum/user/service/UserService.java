@@ -208,6 +208,10 @@ public class UserService {
         userMapper.deleteByPrimaryKey(id);
     }
 
+    /**
+     * 发送短信验证码
+     * @param mobile
+     */
     public void sendSms(String mobile) {
         //由apache的lang3工具类生成六位验证码
         String checkCode = RandomStringUtils.randomNumeric(6);
@@ -244,6 +248,10 @@ public class UserService {
         return 0;
     }
 
+    /**
+     * 发送邮箱验证码
+     * @param email
+     */
     public void sendEmail(String email) {
         //由apache的lang3工具类生成六位验证码
         String checkCode = RandomStringUtils.randomNumeric(6);

@@ -18,11 +18,11 @@ import java.io.Serializable;
 @Document(indexName = "forum_article",type = "article")
 public class Article implements Serializable {
     @Id
-    @Field(index = false,store = true)
+    @Field(index = false,store = true,type = FieldType.Text)
     private String id;//ID
     @Field(index = true,store = true,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word",type = FieldType.Text)
     private String title;//标题
-    @Field(index = true,store = false,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word")//这个和title属性一起加type会报错
+    @Field(index = true,store = false,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word",type = FieldType.Text)
     private String content;//文章正文
     @Field(index = false,store = true,type = FieldType.Text)
     private String image;//文章封面

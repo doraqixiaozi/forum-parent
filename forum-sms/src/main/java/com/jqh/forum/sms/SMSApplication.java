@@ -2,7 +2,7 @@ package com.jqh.forum.sms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
 
 /**
  * @Auther: 几米
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
  */
 @SpringBootApplication
 public class SMSApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(SMSApplication.class);
     }

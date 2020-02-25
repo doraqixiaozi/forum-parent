@@ -177,7 +177,7 @@ public class EmailListener {
                    "                <div class=\"xboxcontent\">\n" +
                    "                    <div class=\"neirong\">\n" +
                    "                        <p><b>验证码：</b><span class=\"font_lightblue\"><span id=\"yzm\" data=\"").append(checkCode).append("\" onclick=\"return false;\" t=\"7\" style=\"border-bottom: 1px dashed rgb(204, 204, 204); z-index: 1; position: static;\">").append(checkCode).append("</span></span><br><span class=\"font_gray\">(请输入该验证码完成验证，验证码30分钟内有效！)</span></p>\n" +
-                   "                        <div class=\"line\">如果你未申请该验证码，请忽略，此为jqh的测试邮件。</div>\n" +
+                   "                        <div class=\"line\">如果你未申请该验证码，请忽略，此为测试邮件。</div>\n" +
                    "                    </div>\n" +
                    "                </div>\n" +
                    "                <b class=\"xbottom\"><b class=\"xb4\"></b><b class=\"xb3\"></b><b class=\"xb2\"></b><b class=\"xb1\"></b></b>\n" +

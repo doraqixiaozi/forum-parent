@@ -77,6 +77,13 @@ public class SpitService {
         return spitDao.findAll(Example.of(spit, matcher));
     }
 
+    /**
+     * 根据昵称分页查询
+     * @param spit
+     * @param page
+     * @param size
+     * @return
+     */
     public Page<Spit> search(Spit spit, int page, int size) {
         PageRequest request = PageRequest.of(page - 1, size);
         ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("nickname", ExampleMatcher.GenericPropertyMatchers.contains()).withIgnoreCase();

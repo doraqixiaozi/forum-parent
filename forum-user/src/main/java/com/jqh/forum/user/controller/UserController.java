@@ -140,9 +140,10 @@ public class UserController {
 		return new Result(true,StatusCode.OK,"发送成功");
 	}
 
-	//发送邮箱验证码
-	@PostMapping("/sendemail/{email}")
-	public Result sendEmail(@PathVariable String email){
+	//发送邮箱验证码（路径中不能出现小数点，所以不能放在路径中）
+	@PostMapping("/sendemail")
+	public Result sendEmail(@RequestBody Map<String,String> emailMap){
+		String email=emailMap.get("email");
 		String redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + email);
 		if (redisCheckCode!=null){
 			return new Result(false,StatusCode.ERROR,"请勿重复发送");
