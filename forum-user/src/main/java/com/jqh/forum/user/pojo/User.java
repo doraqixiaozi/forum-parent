@@ -1,5 +1,6 @@
 package com.jqh.forum.user.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.Id;
@@ -21,11 +22,15 @@ public class User implements Serializable{
 	private String password;//密码
 	private String nickname;//昵称
 	private String sex;//性别
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private java.util.Date birthday;//出生年月日
 	private String avatar;//头像
 	private String email;//E-Mail
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private java.util.Date regdate;//注册日期
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private java.util.Date updatedate;//修改日期
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private java.util.Date lastdate;//最后登陆日期
 	private Long online;//在线时长（分钟）
 	private String interest;//兴趣

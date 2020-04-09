@@ -12,6 +12,13 @@ import org.springframework.web.bind.annotation.PutMapping;
  */
 @FeignClient(value = "forum-user",fallback = UserClientFallBack.class)
 public interface UserClient {
+    /**
+     * 修改粉丝关注
+     * @param userid
+     * @param friendid
+     * @param num
+     * @return
+     */
     @PutMapping("/user/{userid}/{friendid}/{num}")
     public Result updateFanscountAndFollowcount(@PathVariable String userid, @PathVariable String friendid,@PathVariable int num);
 }

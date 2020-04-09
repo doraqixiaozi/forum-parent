@@ -20,6 +20,7 @@
         <module>forum-manager</module>
         <module>forum-web</module>
         <module>forum-config</module>
+        <module>forum-file</module>
     </modules>
 
     <parent>

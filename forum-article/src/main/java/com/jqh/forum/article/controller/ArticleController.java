@@ -1,4 +1,5 @@
 package com.jqh.forum.article.controller;
+import java.util.List;
 import java.util.Map;
 
 import com.jqh.forum.article.service.ArticleService;
@@ -117,5 +118,35 @@ public class ArticleController {
 	@PostMapping("/column/{columnId}/{page}/{size}")
 	public Result column(@PathVariable String columnId,@PathVariable int page,@PathVariable int size){
 		return new Result(true,StatusCode.OK,"查询成功",articleService.column(columnId,page,size));
+	}
+
+	/**
+	 * 获取未同步到es中的文章
+	 * @param page
+	 * @param size
+	 * @return
+	 */
+	@GetMapping("/move/{page}/{size}")
+	public Result<List<Article>> getUnMoveArticle(@PathVariable int page,@PathVariable int size){
+		return new Result(true,StatusCode.OK,"查询成功",articleService.getUnMoveArticle(page,size));
+	}
+
+	/**
+	 * 获取未同步到es中的文章数量
+	 * @return
+	 */
+	@GetMapping("/move/num")
+	public Result<Integer> getUnMoveArticleNum(){
+		return new Result(true,StatusCode.OK,"查询成功",articleService.getUnMoveArticleNum());
+	}
+
+	/**
+	 * 批量设置文章已被同步
+	 * @return
+	 */
+	@PutMapping("/move}")
+	public Result hasMove(@RequestBody List<Article> articles){
+		articleService.hasMove(articles);
+		return new Result(true,StatusCode.OK,"设置同步状态成功",null);
 	}
 }

@@ -18,6 +18,7 @@ zuul:
     forum-search: /search/**
     forum-spit: /spit/**
     forum-user: /user/**
+    forum-file: /file/**
 #   这里配置不让自动配置的服务，即不想对外提供接口只供服务间调用的,这是一个集合所以参数前有一个-
   ignored-services:
 #    避免zuul转发过滤掉token头信息

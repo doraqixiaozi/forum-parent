@@ -55,6 +55,8 @@ public class UserService {
     private JwtUtil jwtUtil;
     @Autowired
     private HttpServletRequest request;
+    private static String checkCodeKey="checkCode:::";
+
     /**
      * 查询全部列表
      *
@@ -201,7 +203,7 @@ public class UserService {
 //            throw new RuntimeException("登录过期!");
 //        }
 //        上面的复杂操作被拦截器做了，这里只需简单的存取
-        String token= (String) request.getAttribute("claims_admin");
+        String token = (String) request.getAttribute("claims_admin");
         if (StringUtils.isBlank(token)) {
             throw new RuntimeException("权限不足");
         }
@@ -210,13 +212,14 @@ public class UserService {
 
     /**
      * 发送短信验证码
+     *
      * @param mobile
      */
     public void sendSms(String mobile) {
         //由apache的lang3工具类生成六位验证码
         String checkCode = RandomStringUtils.randomNumeric(6);
         //向缓存中添加以便验证
-        redisTemplate.opsForValue().set("checkCode_" + mobile, checkCode, 30, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(checkCodeKey + mobile, checkCode, 30, TimeUnit.MINUTES);
         //向用户短信发送
         HashMap map = new HashMap<>();
         map.put("mobile", mobile);
@@ -227,14 +230,14 @@ public class UserService {
     }
 
     public int register(String code, User user) {
-        String redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + user.getMobile());
+        String redisCheckCode = (String) redisTemplate.opsForValue().get(checkCodeKey + user.getMobile());
         //如果redis缓存中还未存入此用户手机号所对应的验证码,则说明并未进行验证
         log.trace(redisCheckCode);
         log.trace(code);
         log.trace(user.toString());
         if (StringUtils.isBlank(redisCheckCode)) {
 //            如果手机验证码为空则尝试邮箱验证码
-            redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + user.getEmail());
+            redisCheckCode = (String) redisTemplate.opsForValue().get(checkCodeKey + user.getEmail());
             if (StringUtils.isBlank(redisCheckCode)) {
                 //表示未发送验证码
                 return 1;
@@ -250,13 +253,14 @@ public class UserService {
 
     /**
      * 发送邮箱验证码
+     *
      * @param email
      */
     public void sendEmail(String email) {
         //由apache的lang3工具类生成六位验证码
         String checkCode = RandomStringUtils.randomNumeric(6);
         //向缓存中添加以便验证
-        redisTemplate.opsForValue().set("checkCode_" + email, checkCode, 30, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(checkCodeKey + email, checkCode, 30, TimeUnit.MINUTES);
         //调用消息队列向用户邮箱发送
         HashMap map = new HashMap<>();
         map.put("email", email);
@@ -268,15 +272,18 @@ public class UserService {
 
     public Map loginByMobile(String code, User user) {
         HashMap<String, Object> map = new HashMap<>();
-        String redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + user.getMobile());
+        String redisCheckCode = (String) redisTemplate.opsForValue().get(checkCodeKey + user.getMobile());
         if (StringUtils.isBlank(redisCheckCode)) {
-            //表示未发送手机验证码
-            map.put("state",2);
-            return map;
+            redisCheckCode = (String) redisTemplate.opsForValue().get(checkCodeKey + user.getEmail());
+            if (StringUtils.isBlank(redisCheckCode)) {
+                //表示未发送验证码
+                map.put("state", 2);
+                return map;
+            }
         }
         if (!redisCheckCode.equals(code)) {
             //验证码错误
-            map.put("state",3);
+            map.put("state", 3);
         }
         //如果验证码正确，则从数据库查询用户信息
         Example example = new Example(User.class);
@@ -286,16 +293,17 @@ public class UserService {
         //如果不存在此用户，则说明未注册，自动帮其生成密码并注册
         if (DB_user == null) {
             this.add(user);
+            DB_user=userMapper.selectOneByExample(example);
             //自动注册并登录成功
-            map.put("state",1);
-        }else {
-            map.put("state",0);
+            map.put("state", 1);
+        } else {
+            map.put("state", 0);
         }
         //生成token并返回
-        String token = jwtUtil.createJWT(DB_user.getId(), DB_user.getMobile(), "user");
-        map.put("nickname",DB_user.getNickname());
-        map.put("id",DB_user.getId());
-        map.put("token",token);
+        String token = jwtUtil.createJWT(DB_user.getId(), DB_user.getMobile() == null ? DB_user.getEmail() : DB_user.getMobile(), "user", DB_user.getNickname());
+        map.put("nickname", DB_user.getNickname());
+        map.put("id", DB_user.getId());
+        map.put("token", token);
         //登录成功
         return map;
     }
@@ -308,30 +316,37 @@ public class UserService {
         User DB_user = userMapper.selectOneByExample(example);
         if (DB_user != null && encoder.matches(user.getPassword(), DB_user.getPassword())) {
             //登录成功
-            String token=null;
-            if (!StringUtils.isBlank(DB_user.getLoginname())){
-                token = jwtUtil.createJWT(DB_user.getId(), DB_user.getLoginname(), "user");
+            String token = null;
+            if (!StringUtils.isBlank(DB_user.getLoginname())) {
+                token = jwtUtil.createJWT(DB_user.getId(), DB_user.getLoginname(), "user", DB_user.getNickname());
             }
-            if (!StringUtils.isBlank(DB_user.getMobile())){
-                token = jwtUtil.createJWT(DB_user.getId(), DB_user.getMobile(), "user");
+            if (!StringUtils.isBlank(DB_user.getMobile())) {
+                token = jwtUtil.createJWT(DB_user.getId(), DB_user.getMobile(), "user", DB_user.getNickname());
             }
-            if (!StringUtils.isBlank(DB_user.getEmail())){
-                token = jwtUtil.createJWT(DB_user.getId(), DB_user.getEmail(), "user");
+            if (!StringUtils.isBlank(DB_user.getEmail())) {
+                token = jwtUtil.createJWT(DB_user.getId(), DB_user.getEmail(), "user", DB_user.getNickname());
             }
-            map.put("token",token);
-            map.put("nickname",DB_user.getNickname());
-            map.put("id",DB_user.getId());
-            map.put("state",1);
-        }else {
+            map.put("token", token);
+            map.put("nickname", DB_user.getNickname());
+            map.put("id", DB_user.getId());
+            map.put("state", 1);
+        } else {
             //登录失败
-            map.put("state",0);
+            map.put("state", 0);
         }
         return map;
     }
 
-    public void updateFanscountAndFollowcount(int num,String userid, String friendid) {
-        userMapper.updateFollowcount(num,userid);
-        userMapper.updateFanscount(num,friendid);
+    /**
+     * 更新用户的关注和被关注人的粉丝数
+     *
+     * @param num
+     * @param userid
+     * @param friendid
+     */
+    public void updateFanscountAndFollowcount(int num, String userid, String friendid) {
+        userMapper.updateFollowcount(num, userid);
+        userMapper.updateFanscount(num, friendid);
     }
 
     public User getInfo(Claims claims) {

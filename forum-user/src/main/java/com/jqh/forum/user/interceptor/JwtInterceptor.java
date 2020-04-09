@@ -24,7 +24,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         //无论如何都放行，只对有token的进行一个简单封装以简化业务里的操作
         String authorization = request.getHeader("Authorization");
         if (!StringUtils.isBlank(authorization)) {
-//如果包含有头信息就进行解析
+             //如果包含有头信息就进行解析
             if(authorization.startsWith("Bearer ")){
                 //如果还是以这个开头的
                 //拿到令牌

@@ -32,5 +32,6 @@ public class Article implements Serializable{
 	private String channelid;//所属频道
 	private String url;//URL
 	private String type;//类型
+	private String flag;//是否已同步至es
 
 }

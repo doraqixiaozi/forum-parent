@@ -44,19 +44,19 @@ public class LabelService {
     }
 
     public void update(Label label) {
-        labelMapper.updateByPrimaryKey(label);
+        labelMapper.updateByPrimaryKeySelective(label);
     }
 
     public void deleteById(String id) {
         labelMapper.deleteByPrimaryKey(id);
     }
 
-    public Map findByCondition(Integer page, Integer size,Label label) {
+    public Map findByCondition(Integer page, Integer size, Label label) {
         Page<Label> labelPage = PageHelper.startPage(page == null ? 0 : page, size == null ? 10 : size);
         List<Label> labels = this.findByCondition(label);
         HashMap hashMap = new HashMap();
-        hashMap.put("total",labelPage.getTotal());
-        hashMap.put("rows",labels);
+        hashMap.put("total", labelPage.getTotal());
+        hashMap.put("rows", labels);
         log.trace(hashMap.toString());
         return hashMap;
     }
@@ -65,16 +65,15 @@ public class LabelService {
         Example example = new Example(Label.class);
         Example.Criteria criteria = example.createCriteria();
 
-        if (StringUtil.isNotEmpty(label.getId())){
-            criteria.andEqualTo("id",label.getId());
+        if (StringUtil.isNotEmpty(label.getId())) {
+            criteria.andEqualTo("id", label.getId());
         }
-        if (StringUtil.isNotEmpty(label.getLabelname())){
-            criteria.andLike("labelname","%"+label.getLabelname()+"%");
+        if (StringUtil.isNotEmpty(label.getLabelname())) {
+            criteria.andLike("labelname", "%" + label.getLabelname() + "%");
         }
-        if (StringUtil.isNotEmpty(label.getState())){
-            criteria.andEqualTo("state",label.getState());
+        if (StringUtil.isNotEmpty(label.getState())) {
+            criteria.andEqualTo("state", label.getState());
         }
-        System.out.println(example.getOredCriteria());
         List<Label> list = labelMapper.selectByExample(example);
         return list;
     }

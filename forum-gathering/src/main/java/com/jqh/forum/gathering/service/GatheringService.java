@@ -1,5 +1,7 @@
 package com.jqh.forum.gathering.service;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -8,12 +10,15 @@ import javax.annotation.Resource;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import entity.PageResult;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import tk.mybatis.mapper.entity.Example;
+import util.CommonUtil;
 import util.IdWorker;
 
 import com.jqh.forum.gathering.mapper.GatheringMapper;
@@ -26,6 +31,7 @@ import com.jqh.forum.gathering.pojo.Gathering;
  *
  */
 @Service
+@Slf4j
 public class GatheringService {
 
 	@Resource
@@ -68,7 +74,7 @@ public class GatheringService {
 		Example.Criteria criteria = example.createCriteria();
 		// 编号
 		if (searchMap.get("id")!=null && !"".equals(searchMap.get("id"))) {
-			criteria.andLike("id","%"+(String)searchMap.get("id")+"%");
+			criteria.andEqualTo("id",(String)searchMap.get("id"));
 		}
 		// 活动名称
 		if (searchMap.get("name")!=null && !"".equals(searchMap.get("name"))) {
@@ -88,7 +94,7 @@ public class GatheringService {
 		}
 		// 活动图片
 		if (searchMap.get("image")!=null && !"".equals(searchMap.get("image"))) {
-			criteria.andLike("image","%"+(String)searchMap.get("image")+"%");
+			criteria.andEqualTo("image",(String)searchMap.get("image"));
 		}
 		// 举办地点
 		if (searchMap.get("address")!=null && !"".equals(searchMap.get("address"))) {
@@ -96,11 +102,32 @@ public class GatheringService {
 		}
 		// 是否可见
 		if (searchMap.get("state")!=null && !"".equals(searchMap.get("state"))) {
-			criteria.andLike("state","%"+(String)searchMap.get("state")+"%");
+			criteria.andEqualTo("state",(String)searchMap.get("state"));
 		}
 		// 城市
 		if (searchMap.get("city")!=null && !"".equals(searchMap.get("city"))) {
 			criteria.andLike("city","%"+(String)searchMap.get("city")+"%");
+		}
+		//开始结束时间
+		if (StringUtils.isNotEmpty((String)searchMap.get("startTime"))) {
+			Date startTime =null;
+			try {
+				startTime =CommonUtil.convertUtil((String) searchMap.get("startTime"));
+			} catch (ParseException e) {
+				log.error("日期转换失败");
+				throw new RuntimeException(e);
+			}
+			criteria.andGreaterThanOrEqualTo("starttime",startTime);
+		}
+		if (StringUtils.isNotEmpty((String)searchMap.get("endTime"))) {
+			Date endTime =null;
+			try {
+				endTime =CommonUtil.convertUtil((String) searchMap.get("endTime"));
+			} catch (ParseException e) {
+				log.error("日期转换失败");
+				throw new RuntimeException(e);
+			}
+			criteria.andLessThanOrEqualTo("endtime",endTime);
 		}
 		return gatheringMapper.selectByExample(example);
 	}

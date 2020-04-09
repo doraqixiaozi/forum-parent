@@ -47,13 +47,13 @@ public class JwtUtil {
      * @param subject
      * @return
      */
-    public String createJWT(String id, String subject, String roles) {
+    public String createJWT(String id, String subject, String roles,String nickName) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
         JwtBuilder builder = Jwts.builder().setId(id)
                 .setSubject(subject)
                 .setIssuedAt(now)
-                .signWith(SignatureAlgorithm.HS256, key.getBytes()).claim("roles", roles);//用新版本后key必须要写成bytes了，要不会报错
+                .signWith(SignatureAlgorithm.HS256, key.getBytes()).claim("roles", roles).claim("nickName",nickName);//用新版本后key必须要写成bytes了，要不会报错
         if (ttl > 0) {
             Date date=new Date(nowMillis + ttl);
             builder.setExpiration(date);

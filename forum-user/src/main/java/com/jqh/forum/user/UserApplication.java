@@ -26,6 +26,7 @@ import javax.annotation.Resource;
 public class UserApplication {
     @Resource
     private RedisConnectionFactory redisConnectionFactory;
+
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class);
     }
@@ -39,8 +40,12 @@ public class UserApplication {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
-    public JwtUtil jwtUtil(){return new JwtUtil();}
+    public JwtUtil jwtUtil() {
+        return new JwtUtil();
+    }
+
     /**
      * 解决redis的key value乱码问题
      *

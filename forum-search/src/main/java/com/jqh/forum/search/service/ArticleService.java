@@ -1,7 +1,7 @@
 package com.jqh.forum.search.service;
 
 import com.jqh.forum.search.dao.ArticleDao;
-import com.jqh.forum.search.pojo.Article;
+import com.jqh.forum.search.pojo.ArticleES;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,11 +20,11 @@ public class ArticleService {
     @Autowired
     private ArticleDao articleDao;
 
-    public void add(Article article){
+    public void add(ArticleES article){
         articleDao.save(article);
     }
 
-    public Page<Article> searchByKey(String key, int page, int size) {
+    public Page<ArticleES> searchByKey(String key, int page, int size) {
         Pageable pageable= PageRequest.of(page-1,size);
         log.debug(key);
        return articleDao.findByTitleLikeOrContentLike(key,key,pageable);

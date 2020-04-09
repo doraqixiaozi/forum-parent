@@ -151,10 +151,10 @@ public class AdminService {
     public Map<String, Object> getInfo(Claims claims) {
         HashMap<String, Object> infoMap = new HashMap<>();
         String id = claims.getId();
-        Admin admin = (Admin) redisTemplate.opsForValue().get("admin_info_" + id);
+        Admin admin = (Admin) redisTemplate.opsForValue().get("admin_info:::" + id);
         if (admin==null){
             admin = adminMapper.selectByPrimaryKey(id);
-            redisTemplate.opsForValue().set("admin_info_" + id,admin,3, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set("admin_info:::" + id,admin,3, TimeUnit.DAYS);
         }
         infoMap.put("avatar","https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif");
         infoMap.put("name", admin.getLoginname());

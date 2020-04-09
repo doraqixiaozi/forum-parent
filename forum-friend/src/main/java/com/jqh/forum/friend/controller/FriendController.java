@@ -24,10 +24,16 @@ public class FriendController {
     @Autowired
     private FriendService friendService;
 
+    /**
+     *
+     * @param friendid
+     * @param type  1:添加好友  2:添加黑名单
+     * @return
+     */
     //添加好友或黑名单
     @PutMapping("/like/{friendid}/{type}")
     public Result addFriend(@PathVariable String friendid, @PathVariable String type) {
-//验证是否登录并拿到当前用户id
+        //验证是否登录并拿到当前用户id
         Claims claims = (Claims) request.getAttribute("claims_user");
         if (claims == null) {
             return new Result(false, StatusCode.ACCESSERROR, "登录状态异常");
@@ -68,7 +74,7 @@ public class FriendController {
             return new Result(false, StatusCode.ACCESSERROR, "登录状态异常");
         }
         String userId = claims.getId();
-        friendService.deleteFriend(userId,friendid);
+        friendService.deleteFriend(userId, friendid);
         return new Result(true, StatusCode.OK, "删除成功");
     }
 

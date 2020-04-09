@@ -24,4 +24,6 @@ public interface ArticleMapper extends Mapper<Article> {
 
     @Select("select * from tb_article where columnid=#{columnId}")
     List<Article> selectByColumnId(String columnId);
+    @Select("select count(*) from tb_article where state='1' and flag='0'")
+    Integer getUnMoveArticleNum();
 }

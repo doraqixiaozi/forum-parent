@@ -37,6 +37,7 @@ public class UserController {
 	private HttpServletRequest request;
 	@Resource
 	private RedisTemplate redisTemplate;
+	private static String checkCodeKey="checkCode:::";
 	/**
 	 * 查询全部数据
 	 * @return
@@ -129,7 +130,7 @@ public class UserController {
 	//发送短信验证码
 	@PostMapping("/sendsms/{mobile}")
 	public Result sendSms(@PathVariable String mobile){
-		String redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + mobile);
+		String redisCheckCode = (String) redisTemplate.opsForValue().get(checkCodeKey + mobile);
 		if (redisCheckCode!=null){
 			return new Result(false,StatusCode.ERROR,"请勿重复发送");
 		}
@@ -144,7 +145,7 @@ public class UserController {
 	@PostMapping("/sendemail")
 	public Result sendEmail(@RequestBody Map<String,String> emailMap){
 		String email=emailMap.get("email");
-		String redisCheckCode = (String) redisTemplate.opsForValue().get("checkCode_" + email);
+		String redisCheckCode = (String) redisTemplate.opsForValue().get(checkCodeKey + email);
 		if (redisCheckCode!=null){
 			return new Result(false,StatusCode.ERROR,"请勿重复发送");
 		}
@@ -213,4 +214,13 @@ public Result register(@PathVariable String code,@RequestBody User user){
 	    return new Result(true, StatusCode.OK, "更新成功");
     }
 
+	@GetMapping("/testLogin")
+	public Result testLogin() {
+		Claims claims_user =  (Claims) request.getAttribute("claims_user");
+		HashMap dataMap = new HashMap<>();
+		dataMap.put("roles",claims_user.get("roles"));
+		dataMap.put("nickName",claims_user.get("nickName"));
+		dataMap.put("id",claims_user.getId());
+		return new Result(true, StatusCode.OK, "测试成功", dataMap);
+	}
 }

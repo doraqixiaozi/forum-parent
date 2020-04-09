@@ -125,11 +125,21 @@ public class AdminController {
             return new Result(false, StatusCode.LOGINERROR, "登录失败");
         }
         //这里应该用户角色权限三表联查拿到权限的，但是这里简化写死了
-        String token = jwtUtil.createJWT(admin.getId(), admin.getLoginname(), "admin");
+        String token = jwtUtil.createJWT(admin.getId(), admin.getLoginname(), "admin","管理员");
         Map map = new HashMap();
         map.put("token", token);
         map.put("roles", "admin");
         return new Result(true, StatusCode.OK, "登录成功", map);
+    }
+
+    @GetMapping("/testLogin")
+    public Result testLogin() {
+        Claims claims_admin = jwtUtil.parseJWT((String) request.getAttribute("claims_admin"));
+        HashMap dataMap = new HashMap<>();
+        dataMap.put("roles",claims_admin.get("roles"));
+        dataMap.put("nickName",claims_admin.get("nickName"));
+        dataMap.put("id",claims_admin.getId());
+        return new Result(true, StatusCode.OK, "测试成功", dataMap);
     }
 
     @PostMapping("/logout")
@@ -152,7 +162,6 @@ public class AdminController {
         }
         Claims claims = jwtUtil.parseJWT(token);
         Map<String,Object> map=adminService.getInfo(claims);
-        ArrayList<Object> objects = new ArrayList<>();
         return new Result(true, StatusCode.OK, "验证成功", map);
     }
 }

@@ -1,6 +1,6 @@
 package com.jqh.forum.search.controller;
 
-import com.jqh.forum.search.pojo.Article;
+import com.jqh.forum.search.pojo.ArticleES;
 import com.jqh.forum.search.service.ArticleService;
 import entity.PageResult;
 import entity.Result;
@@ -24,7 +24,7 @@ public class ArticleController {
     private ArticleService articleService;
 
     @PostMapping()
-    public Result add(@RequestBody Article article) {
+    public Result add(@RequestBody ArticleES article) {
         articleService.add(article);
         return new Result(true, StatusCode.OK, "增加成功");
     }
@@ -39,8 +39,8 @@ public class ArticleController {
      */
     @PutMapping("/{page}/{size}")
     public Result searchByKey(@RequestBody Map<String, String> param, @PathVariable int page, @PathVariable int size) {
-        Page<Article> pageInfromation = articleService.searchByKey(param.get("key"), page, size);
-        return new Result(true, StatusCode.OK, "查询成功", new PageResult<>(pageInfromation.getTotalElements(), pageInfromation.getContent()));
+        Page<ArticleES> pageInfromation = articleService.searchByKey(param.get("key"), page, size);
+        return new Result(true, StatusCode.OK, "查询成功", new PageResult(pageInfromation.getTotalElements(), pageInfromation.getContent()));
     }
 
     @DeleteMapping("/{id}")

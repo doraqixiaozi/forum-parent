@@ -7,6 +7,8 @@ import javax.annotation.Resource;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.jqh.forum.recruit.mapper.EnterpriseMapper;
+import com.jqh.forum.recruit.mapper.RecruitMapper;
+import com.jqh.forum.recruit.pojo.Recruit;
 import entity.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ public class EnterpriseService {
 
     @Resource
     private EnterpriseMapper enterpriseMapper;
+    @Resource
+    private RecruitMapper recruitMapper;
 
     @Autowired
     private IdWorker idWorker;
@@ -139,11 +143,15 @@ public class EnterpriseService {
 
     /**
      * 删除
+     * 删除企业时应同时删除企业的职位
      *
      * @param id
      */
     public void deleteById(String id) {
         enterpriseMapper.deleteByPrimaryKey(id);
+        Example example = new Example(Recruit.class);
+        example.createCriteria().andEqualTo("eid",id);
+        recruitMapper.deleteByExample(example);
     }
 
     //查询热门企业

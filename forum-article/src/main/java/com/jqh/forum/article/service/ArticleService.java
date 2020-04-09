@@ -191,4 +191,32 @@ public class ArticleService {
         List<Article> articles = articleMapper.selectByColumnId(columnId);
         return new PageResult<>(pages.getTotal(),articles);
     }
+
+    /**
+     * 获取未同步且已审核的文章列表(按照创建时间升序)
+     * @param page
+     * @param size
+     * @return
+     */
+    public List<Article> getUnMoveArticle(int page, int size) {
+        Example example = new Example(Article.class);
+        example.createCriteria().andEqualTo("state","1").andEqualTo("flag","0");
+        PageHelper.startPage(page,size,"createtime desc");
+        List<Article> articles = articleMapper.selectByExample(example);
+        return articles;
+    }
+    /**
+     * 批量设置文章已被同步
+     * @return
+     */
+    public void hasMove(List<Article> articles) {
+        for (Article article : articles) {
+            article.setFlag("1");
+            articleMapper.updateByPrimaryKeySelective(article);
+        }
+    }
+
+    public Object getUnMoveArticleNum() {
+        return articleMapper.getUnMoveArticleNum();
+    }
 }

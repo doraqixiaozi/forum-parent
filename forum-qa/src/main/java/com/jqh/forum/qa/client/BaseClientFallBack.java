@@ -11,9 +11,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BaseClientFallBack implements BaseClient{
+    @Override
     public Result findById(String labelId){
         return null;
     }
+    @Override
     public Result findAll(){
         return null;
     }

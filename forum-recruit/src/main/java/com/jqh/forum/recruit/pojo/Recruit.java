@@ -1,6 +1,8 @@
 package com.jqh.forum.recruit.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,6 +26,8 @@ public class Recruit implements Serializable {
     private String type;//任职方式
     private String address;//办公地址
     private String eid;//企业ID
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss" )
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private java.util.Date createtime;//创建日期
     private String state;//状态
     private String url;//网址

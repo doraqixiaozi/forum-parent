@@ -8,6 +8,7 @@ import com.jqh.forum.friend.pojo.NoFriend;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 
@@ -36,7 +37,7 @@ public class FriendService {
         NoFriend nofriend = nofriendMapper.selectByUseridAndFriendid(userId, friendid);
         if (nofriend != null) {
             //如果是则删除黑名单数据
-            nofriendMapper.deleteNoFriend(userId,friendid);
+            nofriendMapper.deleteNoFriend(userId, friendid);
         }
         //如果不存在则插入且islike置0
         friend = new Friend(userId, friendid, "0");
@@ -48,7 +49,7 @@ public class FriendService {
             friendMapper.weAreFriend(userId, friendid);
         }
         //更新双方的粉丝和关注
-        userClient.updateFanscountAndFollowcount(userId, friendid,1);
+        userClient.updateFanscountAndFollowcount(userId, friendid, 1);
         return true;
     }
 
@@ -58,21 +59,22 @@ public class FriendService {
         if (nofriend != null) {
             return false;
         }
-        nofriend = new NoFriend(userId, friendid);
+        //拉黑
+        deleteFriend(userId,friendid);
         return true;
     }
 
     //删除并拉黑
-    public void deleteFriend(String userid,String friendid) {
+    public void deleteFriend(String userid, String friendid) {
         //删除好友表中的数据
-        friendMapper.deleteFriend(userid,friendid);
+        friendMapper.deleteFriend(userid, friendid);
         //更新friendid到userid的islike为0
-        friendMapper.iAmNotYourFriend(friendid,userid);
+        friendMapper.iAmNotYourFriend(friendid, userid);
         //更新黑名单并添加进去
         NoFriend noFriend = new NoFriend(userid, friendid);
         nofriendMapper.insert(noFriend);
         //双方关注数与粉丝数更新
-        userClient.updateFanscountAndFollowcount(userid,friendid,-1);
+        userClient.updateFanscountAndFollowcount(userid, friendid, -1);
 
     }
 }
