@@ -223,4 +223,14 @@ public Result register(@PathVariable String code,@RequestBody User user){
 		dataMap.put("id",claims_user.getId());
 		return new Result(true, StatusCode.OK, "测试成功", dataMap);
 	}
+
+	/**
+	 * 改变用户封禁状态
+	 * @return
+	 */
+	@GetMapping("/{id}/{state}")
+	public Result changeState(@PathVariable String id,@PathVariable String state) {
+		userService.changeState(id,state);
+		return new Result(true, StatusCode.OK, "修改成功");
+	}
 }

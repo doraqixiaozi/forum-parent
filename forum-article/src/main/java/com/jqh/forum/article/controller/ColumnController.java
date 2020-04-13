@@ -128,4 +128,14 @@ public class ColumnController {
 		searchMap.put("userId",userId);
 		return new Result(true,StatusCode.OK,"查询成功",columnService.findSearch(searchMap));
 	}
+
+	/**
+	 * 审核/封禁专栏
+	 */
+	@PutMapping(value="/{columnId}/{state}")
+	public Result changeState( @PathVariable String columnId,@PathVariable String state){
+		HashMap<Object, Object> searchMap = new HashMap<>();
+		columnService.changeState(columnId,state);
+		return new Result(true,StatusCode.OK,"修改成功");
+	}
 }

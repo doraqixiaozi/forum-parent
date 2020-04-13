@@ -1,4 +1,5 @@
 package com.jqh.forum.article.controller;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -144,9 +145,29 @@ public class ArticleController {
 	 * 批量设置文章已被同步
 	 * @return
 	 */
-	@PutMapping("/move}")
+	@PutMapping("/move")
 	public Result hasMove(@RequestBody List<Article> articles){
 		articleService.hasMove(articles);
 		return new Result(true,StatusCode.OK,"设置同步状态成功",null);
+	}
+
+	/**
+	 * 审核/拉黑文章
+	 */
+	@PutMapping(value="/{articleId}/{state}")
+	public Result changeState( @PathVariable String articleId,@PathVariable String state){
+		HashMap<Object, Object> searchMap = new HashMap<>();
+		articleService.changeState(articleId,state);
+		return new Result(true,StatusCode.OK,"修改成功");
+	}
+
+	/**
+	 * 手动同步文章
+	 */
+	@PutMapping(value="/move/{articleId}")
+	public Result move( @PathVariable String articleId){
+		HashMap<Object, Object> searchMap = new HashMap<>();
+		articleService.move(articleId);
+		return new Result(true,StatusCode.OK,"同步成功");
 	}
 }

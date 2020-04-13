@@ -1,6 +1,8 @@
 package com.jqh.forum.article.mapper;
 
 import com.jqh.forum.article.pojo.Column;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 import tk.mybatis.mapper.common.Mapper;
 
 /**
@@ -9,4 +11,6 @@ import tk.mybatis.mapper.common.Mapper;
  * @Description: ColumnMapper
  */
 public interface ColumnMapper extends Mapper<Column> {
+    @Update("update tb_column set state=#{state} where id=#{columnId}")
+    void changeState(@Param("columnId") String columnId, @Param("state")String state);
 }

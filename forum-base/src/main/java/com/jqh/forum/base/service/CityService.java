@@ -7,6 +7,7 @@ import com.jqh.forum.base.pojo.City;
 import com.jqh.forum.base.pojo.Label;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 import util.IdWorker;
@@ -29,51 +30,58 @@ public class CityService {
     private IdWorker idWorker;
     @Resource
     private CityMapper cityMapper;
-
-    public List<City> findAll(){
-        return cityMapper.selectAll();
+    @Resource
+    private RedisTemplate redisTemplate;
+    static String CITY_REDIS_KEY_PREFIX="base:::city:::";
+    public List<City> findAll() {
+        List<City> cities = (List<City>) redisTemplate.opsForValue().get(CITY_REDIS_KEY_PREFIX + "all");
+        if (cities==null){
+            cities=cityMapper.selectAll();
+            redisTemplate.opsForValue().set(CITY_REDIS_KEY_PREFIX + "all",cities);
+        }
+        return cities;
     }
 
-    public City findById(String id){
+    public City findById(String id) {
         return cityMapper.selectByPrimaryKey(id);
     }
 
-    public void add(City city){
-        city.setId(idWorker.nextId()+"");
+    public void add(City city) {
+        city.setId(idWorker.nextId() + "");
         cityMapper.insert(city);
     }
 
-    public void update(City city){
+    public void update(City city) {
         cityMapper.updateByPrimaryKeySelective(city);
     }
 
-    public void deleteById(String id){
+    public void deleteById(String id) {
         cityMapper.deleteByPrimaryKey(id);
     }
 
-    public List<City> findByCondition(City city){
+    public List<City> findByCondition(City city) {
         Example example = new Example(City.class);
         Example.Criteria criteria = example.createCriteria();
 
-        if (StringUtils.isNotEmpty(city.getId())){
-            criteria.andEqualTo("id",city.getId());
+        if (StringUtils.isNotEmpty(city.getId())) {
+            criteria.andEqualTo("id", city.getId());
         }
-        if (StringUtils.isNotEmpty(city.getName())){
-            criteria.andLike("name","%"+city.getName()+"%");
+        if (StringUtils.isNotEmpty(city.getName())) {
+            criteria.andLike("name", "%" + city.getName() + "%");
         }
-        if (StringUtils.isNotEmpty(city.getIshot())){
-            criteria.andEqualTo("ishot",city.getIshot());
+        if (StringUtils.isNotEmpty(city.getIshot())) {
+            criteria.andEqualTo("ishot", city.getIshot());
         }
 
         return cityMapper.selectByExample(example);
     }
 
-    public Map findByCondition(Integer page, Integer size, City city){
+    public Map findByCondition(Integer page, Integer size, City city) {
         Page<City> cityPage = PageHelper.startPage(page == null ? 0 : page, size == null ? 10 : size);
         List<City> cities = findByCondition(city);
         HashMap hashMap = new HashMap();
-        hashMap.put("total",cityPage.getTotal());
-        hashMap.put("rows",cities);
+        hashMap.put("total", cityPage.getTotal());
+        hashMap.put("rows", cities);
 //        log.trace(hashMap.toString());
         return hashMap;
     }

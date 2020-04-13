@@ -4,6 +4,7 @@ import com.jqh.forum.search.client.ArticleClient;
 import com.jqh.forum.search.dao.ArticleDao;
 import com.jqh.forum.search.pojo.Article;
 import com.jqh.forum.search.pojo.ArticleES;
+import com.jqh.forum.search.util.SearchUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -57,15 +58,7 @@ public class DB2ES {
                 break;
             }
             articles.forEach(System.out::println);
-            List<ArticleES> collect = articles.stream().map(article -> {
-                ArticleES articleES = new ArticleES();
-                articleES.setContent(article.getContent());
-                articleES.setId(article.getId());
-                articleES.setImage(article.getImage());
-                articleES.setTitle(article.getTitle());
-                log.trace(articleES.toString());
-                return articleES;
-            }).collect(Collectors.toList());
+            List<ArticleES> collect = articles.stream().map(article -> SearchUtil.article2ES(article)).collect(Collectors.toList());
             log.debug(collect.size()+"");
             collect.forEach(System.out::println);
             articleDao.saveAll(collect);

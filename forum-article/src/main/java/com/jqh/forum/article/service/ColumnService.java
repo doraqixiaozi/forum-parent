@@ -70,27 +70,34 @@ public class ColumnService {
 	public List<Column> findSearch(Map whereMap) {
 		Example example = new Example(Column.class);
 		Example.Criteria criteria = example.createCriteria();
-		// ID
-		if (whereMap.get("id")!=null && !"".equals(whereMap.get("id"))) {
-			criteria.andLike("id","%"+(String)whereMap.get("id")+"%");
-		}
 		// 专栏名称
 		if (whereMap.get("name")!=null && !"".equals(whereMap.get("name"))) {
 			criteria.andLike("name","%"+(String)whereMap.get("name")+"%");
 		}
 		// 专栏简介
 		if (whereMap.get("summary")!=null && !"".equals(whereMap.get("summary"))) {
-			criteria.andLike("summary","%"+(String)whereMap.get("summary")+"%");
+			criteria.andEqualTo("summary",(String)whereMap.get("summary"));
 		}
 		// 用户ID
 		if (whereMap.get("userid")!=null && !"".equals(whereMap.get("userid"))) {
-			criteria.andLike("userid","%"+(String)whereMap.get("userid")+"%");
+			criteria.andEqualTo("userid",(String)whereMap.get("userid"));
 		}
 		// 状态
 		if (whereMap.get("state")!=null && !"".equals(whereMap.get("state"))) {
-			criteria.andLike("state","%"+(String)whereMap.get("state")+"%");
+			criteria.andEqualTo("state",(String)whereMap.get("state"));
 		}
-
+		if (whereMap.get("createtimeFrom")!=null ) {
+			criteria.andGreaterThanOrEqualTo("createtimeFrom",whereMap.get("createtimeFrom"));
+		}
+		if (whereMap.get("createtimeEnd")!=null ) {
+			criteria.andLessThanOrEqualTo("createtimeEnd",whereMap.get("createtimeEnd"));
+		}
+		if (whereMap.get("checktimeFrom")!=null ) {
+			criteria.andGreaterThanOrEqualTo("checktimeFrom",whereMap.get("checktimeFrom"));
+		}
+		if (whereMap.get("checktimeEnd")!=null ) {
+			criteria.andLessThanOrEqualTo("checktimeEnd",whereMap.get("checktimeEnd"));
+		}
 		return columnMapper.selectByExample(example);
 	}
 
@@ -117,7 +124,7 @@ public class ColumnService {
 	 * @param column
 	 */
 	public void update(Column column) {
-		columnMapper.updateByPrimaryKey(column);
+		columnMapper.updateByPrimaryKeySelective(column);
 	}
 
 	/**
@@ -138,4 +145,7 @@ public class ColumnService {
 	}
 
 
+	public void changeState(String columnId, String state) {
+		columnMapper.changeState(columnId,state);
+	}
 }

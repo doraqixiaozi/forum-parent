@@ -1,12 +1,17 @@
 package com.jqh.forum.recruit.service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.jqh.forum.recruit.dto.RecruitDTO;
+import com.jqh.forum.recruit.mapper.EnterpriseMapper;
 import com.jqh.forum.recruit.mapper.RecruitMapper;
+import com.jqh.forum.recruit.pojo.Enterprise;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +33,9 @@ public class RecruitService {
 
     @Resource
     private RecruitMapper recruitMapper;
+    @Resource
+    private EnterpriseMapper enterpriseMapper;
+    private static HashMap<String,String> enterprises=null;
 
     @Autowired
     private IdWorker idWorker;
@@ -53,9 +61,26 @@ public class RecruitService {
     public Map findSearch(Map whereMap, int page, int size) {
         Page<Recruit> recruitPage = PageHelper.startPage(page, size);
         List<Recruit> recruits = this.findSearch(whereMap);
+        //如果企业缓存为null则设置缓存
+        if (enterprises==null){
+            List<Enterprise> es = enterpriseMapper.selectAll();
+            enterprises=new HashMap<>();
+            if (es!=null){
+                es.forEach(enterprise -> {
+                    enterprises.put(enterprise.getId(),enterprise.getName());
+                });
+            }
+        }
+        //将结果集转为dto
+        List<RecruitDTO> dtos = recruits.stream().map(r -> {
+            RecruitDTO recruitDTO = new RecruitDTO();
+            BeanUtils.copyProperties(r, recruitDTO);
+            recruitDTO.setEName(enterprises.get(recruitDTO.getEid()));
+            return recruitDTO;
+        }).collect(Collectors.toList());
         HashMap hashMap = new HashMap();
         hashMap.put("total", recruitPage.getTotal());
-        hashMap.put("rows", recruits);
+        hashMap.put("rows", dtos);
         log.trace(hashMap.toString());
         return hashMap;
     }

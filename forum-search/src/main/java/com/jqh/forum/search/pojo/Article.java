@@ -1,6 +1,8 @@
 package com.jqh.forum.search.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.io.Serializable;
@@ -18,7 +20,11 @@ public class Article implements Serializable {
     private String title;//标题
     private String content;//文章正文
     private String image;//文章封面
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss" )
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private java.util.Date createtime;//发表日期
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss" )
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private java.util.Date updatetime;//修改日期
     private String ispublic;//是否公开
     private String istop;//是否置顶

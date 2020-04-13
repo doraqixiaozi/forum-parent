@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.jqh.forum.article.client.SearchClient;
 import com.jqh.forum.article.mapper.ArticleMapper;
 import entity.PageResult;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,8 @@ public class ArticleService {
     private IdWorker idWorker;
     @Autowired
     RedisTemplate redisTemplate;
+    @Resource
+    SearchClient searchClient;
 
     /**
      * 查询全部列表
@@ -218,5 +221,27 @@ public class ArticleService {
 
     public Object getUnMoveArticleNum() {
         return articleMapper.getUnMoveArticleNum();
+    }
+
+    /**
+     * 审核/拉黑文章，审核后自动同步到es库,如果是拉黑则从库中删除
+     * @param articleId
+     * @param state
+     */
+    public void changeState(String articleId, String state) {
+        articleMapper.changeState(articleId,state);
+        if ("1".equals(state)){
+            this.move(articleId);
+        }
+        if ("0".equals(state)){
+             searchClient.deleteByKey(articleId);
+        }
+    }
+    /**
+     * 手动同步文章到es库
+     * @param articleId
+     */
+    public void move(String articleId) {
+        searchClient.add(this.findById(articleId));
     }
 }

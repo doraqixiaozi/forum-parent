@@ -17,4 +17,6 @@ public interface UserMapper extends Mapper<User> {
     //关注数加一
     @Update("update tb_user set followcount=followcount+#{num} where id=#{userid}")
     void updateFollowcount(@Param("num")int num, @Param("userid")String userid);
+    @Update("update tb_user set state=#{state} where id=#{id}")
+    void changeState(@Param("id")String id,@Param("state") String state);
 }

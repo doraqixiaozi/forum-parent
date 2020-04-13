@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public class UserService {
     private JwtUtil jwtUtil;
     @Autowired
     private HttpServletRequest request;
-    private static String checkCodeKey="checkCode:::";
+    private static String checkCodeKey = "checkCode:::";
 
     /**
      * 查询全部列表
@@ -77,7 +78,13 @@ public class UserService {
      */
     public PageResult<User> findSearch(Map whereMap, int page, int size) {
         Page<User> users = PageHelper.startPage(page, size);
-        List<User> search = this.findSearch(whereMap);
+        List<User> search = this.findSearch(whereMap).stream().
+                map(user -> {
+                    user.setPassword("");
+                    return user;
+                }).
+                collect(Collectors.toList());
+
         PageResult<User> pageResult = new PageResult<>(users.getTotal(), search);
         return pageResult;
     }
@@ -92,10 +99,6 @@ public class UserService {
     public List<User> findSearch(Map searchMap) {
         Example example = new Example(User.class);
         Example.Criteria criteria = example.createCriteria();
-        // ID
-        if (searchMap.get("id") != null && !"".equals(searchMap.get("id"))) {
-            criteria.andLike("id", "%" + (String) searchMap.get("id") + "%");
-        }
         // 登陆名称
         if (searchMap.get("loginname") != null && !"".equals(searchMap.get("loginname"))) {
             criteria.andLike("loginname", "%" + (String) searchMap.get("loginname") + "%");
@@ -103,10 +106,6 @@ public class UserService {
         // 手机号
         if (searchMap.get("mobile") != null && !"".equals(searchMap.get("mobile"))) {
             criteria.andLike("mobile", "%" + (String) searchMap.get("mobile") + "%");
-        }
-        // 密码
-        if (searchMap.get("password") != null && !"".equals(searchMap.get("password"))) {
-            criteria.andLike("password", "%" + (String) searchMap.get("password") + "%");
         }
         // 昵称
         if (searchMap.get("nickname") != null && !"".equals(searchMap.get("nickname"))) {
@@ -131,6 +130,10 @@ public class UserService {
         // 个性
         if (searchMap.get("personality") != null && !"".equals(searchMap.get("personality"))) {
             criteria.andLike("personality", "%" + (String) searchMap.get("personality") + "%");
+        }
+        // 登陆名称
+        if (searchMap.get("state") != null && !"".equals(searchMap.get("state"))) {
+            criteria.andEqualTo("state", (String) searchMap.get("state"));
         }
         return userMapper.selectByExample(example);
     }
@@ -293,7 +296,7 @@ public class UserService {
         //如果不存在此用户，则说明未注册，自动帮其生成密码并注册
         if (DB_user == null) {
             this.add(user);
-            DB_user=userMapper.selectOneByExample(example);
+            DB_user = userMapper.selectOneByExample(example);
             //自动注册并登录成功
             map.put("state", 1);
         } else {
@@ -354,5 +357,9 @@ public class UserService {
         User user = userMapper.selectByPrimaryKey(id);
         user.setPassword(null);
         return user;
+    }
+
+    public void changeState(String id, String state) {
+        userMapper.changeState(id,state);
     }
 }

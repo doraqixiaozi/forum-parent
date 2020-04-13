@@ -30,7 +30,7 @@ public interface ArticleClient {
     /**
      * 批量设置文章已被同步
      */
-    @PutMapping("/article/move}")
+    @PutMapping("/article/move")
     Result hasMove(List<Article> articles);
 
     /**

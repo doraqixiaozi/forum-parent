@@ -1,7 +1,9 @@
 package com.jqh.forum.search.controller;
 
+import com.jqh.forum.search.pojo.Article;
 import com.jqh.forum.search.pojo.ArticleES;
 import com.jqh.forum.search.service.ArticleService;
+import com.jqh.forum.search.util.SearchUtil;
 import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
@@ -18,14 +20,14 @@ import java.util.Map;
  */
 @RestController
 @CrossOrigin
-@RequestMapping("/article")
+@RequestMapping("/articleES")
 public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
     @PostMapping()
-    public Result add(@RequestBody ArticleES article) {
-        articleService.add(article);
+    public Result add(@RequestBody Article article) {
+        articleService.add(SearchUtil.article2ES(article));
         return new Result(true, StatusCode.OK, "增加成功");
     }
 
@@ -44,7 +46,7 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{id}")
-    public Result searchByKey(@PathVariable String id) {
+    public Result deleteByKey(@PathVariable String id) {
         articleService.deleteById(id);
         return new Result(true, StatusCode.OK, "删除成功");
     }

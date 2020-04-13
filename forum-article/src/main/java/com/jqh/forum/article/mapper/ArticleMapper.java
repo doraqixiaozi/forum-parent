@@ -1,6 +1,7 @@
 package com.jqh.forum.article.mapper;
 
 import com.jqh.forum.article.pojo.Article;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import tk.mybatis.mapper.common.Mapper;
@@ -26,4 +27,6 @@ public interface ArticleMapper extends Mapper<Article> {
     List<Article> selectByColumnId(String columnId);
     @Select("select count(*) from tb_article where state='1' and flag='0'")
     Integer getUnMoveArticleNum();
+    @Update("update tb_article set state=#{state} where id=#{articleId}")
+    void changeState(@Param("articleId") String articleId,@Param("state") String state);
 }
