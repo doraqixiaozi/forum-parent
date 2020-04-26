@@ -50,4 +50,9 @@ public class ArticleController {
         articleService.deleteById(id);
         return new Result(true, StatusCode.OK, "删除成功");
     }
+
+    @GetMapping("")
+    public Result list() {
+        return new Result(true, StatusCode.OK, "查询成功");
+    }
 }

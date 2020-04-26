@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.jqh.forum.user.client.ArticleClient;
 import com.jqh.forum.user.mapper.UserMapper;
 import entity.PageResult;
 import io.jsonwebtoken.Claims;
@@ -41,6 +42,8 @@ import util.JwtUtil;
 @Transactional
 @Service
 public class UserService {
+    @Resource
+    private ArticleClient articleClient;
     @Autowired
     private BCryptPasswordEncoder encoder;
     @Resource
@@ -173,12 +176,17 @@ public class UserService {
     }
 
     /**
-     * 修改
+     * 修改,更新时需同步更新article表中的冗余数据
      *
      * @param user
      */
     public void update(User user) {
         log.trace(user.toString());
+        HashMap map = new HashMap();
+        map.put("nickname",user.getNickname());
+        map.put("userid",user.getId());
+        map.put("avatar",user.getAvatar());
+        articleClient.updateUserData(map);
         userMapper.updateByPrimaryKeySelective(user);
     }
 
@@ -241,6 +249,7 @@ public class UserService {
         if (StringUtils.isBlank(redisCheckCode)) {
 //            如果手机验证码为空则尝试邮箱验证码
             redisCheckCode = (String) redisTemplate.opsForValue().get(checkCodeKey + user.getEmail());
+            log.trace(redisCheckCode);
             if (StringUtils.isBlank(redisCheckCode)) {
                 //表示未发送验证码
                 return 1;
@@ -317,6 +326,7 @@ public class UserService {
         Example.Criteria criteria = example.createCriteria();
         criteria.orEqualTo("loginname", user.getLoginname()).orEqualTo("mobile", user.getMobile()).orEqualTo("email", user.getEmail());
         User DB_user = userMapper.selectOneByExample(example);
+        log.trace(user.getPassword());
         if (DB_user != null && encoder.matches(user.getPassword(), DB_user.getPassword())) {
             //登录成功
             String token = null;
@@ -332,6 +342,7 @@ public class UserService {
             map.put("token", token);
             map.put("nickname", DB_user.getNickname());
             map.put("id", DB_user.getId());
+            map.put("avatar",DB_user.getAvatar());
             map.put("state", 1);
         } else {
             //登录失败

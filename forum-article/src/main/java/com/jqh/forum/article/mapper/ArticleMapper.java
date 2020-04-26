@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,4 +30,6 @@ public interface ArticleMapper extends Mapper<Article> {
     Integer getUnMoveArticleNum();
     @Update("update tb_article set state=#{state} where id=#{articleId}")
     void changeState(@Param("articleId") String articleId,@Param("state") String state);
+    @Update("update tb_article set nickname=#{nickname},avatar=#{avatar} where userid=#{userid}")
+    void updateUserData(@Param("nickname") String nickName,@Param("avatar") String avatar,@Param("userid") String userId);
 }

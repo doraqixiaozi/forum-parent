@@ -3,12 +3,7 @@ package com.jqh.forum.qa.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.jqh.forum.qa.pojo.Reply;
 import com.jqh.forum.qa.service.ReplyService;
@@ -81,7 +76,7 @@ public class ReplyController {
      *
      * @param reply
      */
-    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public Result add(@RequestBody Reply reply) {
         replyService.add(reply);
         return new Result(true, StatusCode.OK, "增加成功");
@@ -101,12 +96,10 @@ public class ReplyController {
 
     /**
      * 删除
-     *
-     * @param id
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public Result delete(@PathVariable String id) {
-        replyService.deleteById(id);
+    @PutMapping
+    public Result delete(@RequestBody Reply reply) {
+        replyService.delete(reply);
         return new Result(true, StatusCode.OK, "删除成功");
     }
 

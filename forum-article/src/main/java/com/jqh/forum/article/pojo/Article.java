@@ -33,10 +33,10 @@ public class Article implements Serializable{
 	private String istop;//是否置顶
 	private Integer visits;//浏览量
 	private Integer thumbup;//点赞数
-	private Integer comment;//评论数
 	private String state;//审核状态
 	private String channelid;//所属频道
-	private String url;//URL
+	private String nickname;//用户名
+	private String avatar;//用户头像
 	private String type;//类型
 	private String flag;//是否已同步至es
 

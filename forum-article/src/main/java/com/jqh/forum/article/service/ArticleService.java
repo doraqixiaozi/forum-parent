@@ -1,5 +1,7 @@
 package com.jqh.forum.article.service;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,8 +11,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.jqh.forum.article.client.SearchClient;
 import com.jqh.forum.article.mapper.ArticleMapper;
+import com.jqh.forum.article.mapper.CommentMapper;
 import entity.PageResult;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -33,7 +37,8 @@ public class ArticleService {
 
     @Resource
     private ArticleMapper articleMapper;
-
+    @Resource
+    private CommentMapper commentMapper;
     @Autowired
     private IdWorker idWorker;
     @Autowired
@@ -60,7 +65,7 @@ public class ArticleService {
      * @return
      */
     public PageResult<Article> findSearch(Map whereMap, int page, int size) {
-        Page<Article> problems = PageHelper.startPage(page, size);
+        Page<Article> problems = PageHelper.startPage(page, size, "createtime desc");
         List<Article> search = this.findSearch(whereMap);
         PageResult<Article> problemPageResult = new PageResult<>(problems.getTotal(), search);
         return problemPageResult;
@@ -78,15 +83,15 @@ public class ArticleService {
         Example.Criteria criteria = example.createCriteria();
         // ID
         if (whereMap.get("id") != null && !"".equals(whereMap.get("id"))) {
-            criteria.andLike("id", "%" + (String) whereMap.get("id") + "%");
+            criteria.andEqualTo("id", (String) whereMap.get("id"));
         }
         // 专栏ID
         if (whereMap.get("columnid") != null && !"".equals(whereMap.get("columnid"))) {
-            criteria.andLike("columnid", "%" + (String) whereMap.get("columnid") + "%");
+            criteria.andEqualTo("columnid", (String) whereMap.get("columnid"));
         }
         // 用户ID
         if (whereMap.get("userid") != null && !"".equals(whereMap.get("userid"))) {
-            criteria.andLike("userid", "%" + (String) whereMap.get("userid") + "%");
+            criteria.andEqualTo("userid", (String) whereMap.get("userid"));
         }
         // 标题
         if (whereMap.get("title") != null && !"".equals(whereMap.get("title"))) {
@@ -102,27 +107,27 @@ public class ArticleService {
         }
         // 是否公开
         if (whereMap.get("ispublic") != null && !"".equals(whereMap.get("ispublic"))) {
-            criteria.andLike("ispublic", "%" + (String) whereMap.get("ispublic") + "%");
+            criteria.andEqualTo("ispublic", (String) whereMap.get("ispublic"));
         }
         // 是否置顶
         if (whereMap.get("istop") != null && !"".equals(whereMap.get("istop"))) {
-            criteria.andLike("istop", "%" + (String) whereMap.get("istop") + "%");
+            criteria.andEqualTo("istop", (String) whereMap.get("istop"));
         }
         // 审核状态（这个原来叫condition）
         if (whereMap.get("state") != null && !"".equals(whereMap.get("state"))) {
-            criteria.andLike("state", "%" + (String) whereMap.get("state") + "%");
+            criteria.andEqualTo("state", (String) whereMap.get("state"));
         }
         // 所属频道
         if (whereMap.get("channelid") != null && !"".equals(whereMap.get("channelid"))) {
-            criteria.andLike("channelid", "%" + (String) whereMap.get("channelid") + "%");
+            criteria.andEqualTo("channelid", (String) whereMap.get("channelid"));
         }
-        // URL
-        if (whereMap.get("url") != null && !"".equals(whereMap.get("url"))) {
-            criteria.andLike("url", "%" + (String) whereMap.get("url") + "%");
+        // 头像
+        if (whereMap.get("avatar") != null && !"".equals(whereMap.get("avatar"))) {
+            criteria.andEqualTo("avatar", (String) whereMap.get("avatar"));
         }
         // 类型
         if (whereMap.get("type") != null && !"".equals(whereMap.get("type"))) {
-            criteria.andLike("type", "%" + (String) whereMap.get("type") + "%");
+            criteria.andEqualTo("type", (String) whereMap.get("type"));
         }
         return articleMapper.selectByExample(example);
     }
@@ -134,10 +139,10 @@ public class ArticleService {
      * @return
      */
     public Article findById(String id) {
-        Article article=(Article)redisTemplate.opsForValue().get("article:::" + id);
-        if (article==null){
-            article=articleMapper.selectByPrimaryKey(id);
-            redisTemplate.opsForValue().set("article:::"+id,article);
+        Article article = (Article) redisTemplate.opsForValue().get("article:::" + id);
+        if (article == null) {
+            article = articleMapper.selectByPrimaryKey(id);
+            redisTemplate.opsForValue().set("article:::" + id, article);
         }
         return article;
     }
@@ -149,6 +154,12 @@ public class ArticleService {
      */
     public void add(Article article) {
         article.setId(idWorker.nextId() + "");
+        if (article.getCreatetime() == null) {
+            article.setCreatetime(new Date());
+        }
+        if (StringUtils.isEmpty(article.getState())) {
+            article.setState("0");
+        }
         articleMapper.insert(article);
     }
 
@@ -159,7 +170,7 @@ public class ArticleService {
      */
     public void update(Article article) {
         articleMapper.updateByPrimaryKey(article);
-        redisTemplate.delete("article:::"+article.getId());
+        redisTemplate.delete("article:::" + article.getId());
     }
 
     /**
@@ -169,7 +180,7 @@ public class ArticleService {
      */
     public void deleteById(String id) {
         articleMapper.deleteByPrimaryKey(id);
-        redisTemplate.delete("article:::"+id);
+        redisTemplate.delete("article:::" + id);
     }
 
     //审核通过
@@ -185,31 +196,34 @@ public class ArticleService {
     public PageResult<Article> channel(String channelId, int page, int size) {
         Page<Article> pages = PageHelper.startPage(page, size);
         List<Article> articles = articleMapper.selectByChannelId(channelId);
-        return new PageResult<>(pages.getTotal(),articles);
+        return new PageResult<>(pages.getTotal(), articles);
     }
 
 
     public PageResult<Article> column(String columnId, int page, int size) {
         Page<Article> pages = PageHelper.startPage(page, size);
         List<Article> articles = articleMapper.selectByColumnId(columnId);
-        return new PageResult<>(pages.getTotal(),articles);
+        return new PageResult<>(pages.getTotal(), articles);
     }
 
     /**
      * 获取未同步且已审核的文章列表(按照创建时间升序)
+     *
      * @param page
      * @param size
      * @return
      */
     public List<Article> getUnMoveArticle(int page, int size) {
         Example example = new Example(Article.class);
-        example.createCriteria().andEqualTo("state","1").andEqualTo("flag","0");
-        PageHelper.startPage(page,size,"createtime desc");
+        example.createCriteria().andEqualTo("state", "1").andEqualTo("flag", "0");
+        PageHelper.startPage(page, size, "createtime desc");
         List<Article> articles = articleMapper.selectByExample(example);
         return articles;
     }
+
     /**
      * 批量设置文章已被同步
+     *
      * @return
      */
     public void hasMove(List<Article> articles) {
@@ -225,23 +239,37 @@ public class ArticleService {
 
     /**
      * 审核/拉黑文章，审核后自动同步到es库,如果是拉黑则从库中删除
+     *
      * @param articleId
      * @param state
      */
     public void changeState(String articleId, String state) {
-        articleMapper.changeState(articleId,state);
-        if ("1".equals(state)){
+        articleMapper.changeState(articleId, state);
+        if ("1".equals(state)) {
+            log.trace("同步文章id:{}", articleId);
             this.move(articleId);
         }
-        if ("0".equals(state)){
-             searchClient.deleteByKey(articleId);
+        if ("0".equals(state)) {
+            log.trace("删除文章id:{}", articleId);
+            searchClient.deleteByKey(articleId);
         }
     }
+
     /**
      * 手动同步文章到es库
+     *
      * @param articleId
      */
     public void move(String articleId) {
         searchClient.add(this.findById(articleId));
+    }
+
+    /**
+     * 当用户更新信息时同步到文章和评论表
+     * @param userData
+     */
+    public void updateUserData(HashMap<String, String> userData) {
+        articleMapper.updateUserData(userData.get("nickname"), userData.get("avatar"), userData.get("userid"));
+        commentMapper.updateUserData(userData.get("nickname"), userData.get("avatar"), userData.get("userid"));
     }
 }

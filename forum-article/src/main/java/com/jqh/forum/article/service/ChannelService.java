@@ -39,7 +39,7 @@ public class ChannelService {
 	 * @return
 	 */
 	public List<Channel> findAll() {
-		return channelMapper.selectAll();
+		return channelMapper.getAll();
 	}
 
 	

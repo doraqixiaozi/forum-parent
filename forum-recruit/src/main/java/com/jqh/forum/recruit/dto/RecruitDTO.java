@@ -15,4 +15,9 @@ public class RecruitDTO extends Recruit {
      * 职位所属企业名称
      */
     private String eName;
+
+    /**
+     * 职位所属企业名称
+     */
+    private String labelName;
 }

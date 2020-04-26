@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author 862965251@qq.com
  * @date 2020-04-13 19:30
  */
-@FeignClient(value = "forum-article",fallback = SearchClientFallBack.class)
+@FeignClient(value = "forum-search",fallback = SearchClientFallBack.class)
 public interface SearchClient {
     @PostMapping("/articleES")
     public Result add(@RequestBody Article article) ;

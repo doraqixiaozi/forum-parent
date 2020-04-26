@@ -21,17 +21,19 @@ public class ArticleService {
     private ArticleDao articleDao;
 
     public void add(ArticleES article){
+//        log.trace("add{}",article);
         articleDao.save(article);
     }
 
     public Page<ArticleES> searchByKey(String key, int page, int size) {
         Pageable pageable= PageRequest.of(page-1,size);
-        log.debug(key);
        return articleDao.findByTitleLikeOrContentLike(key,key,pageable);
 //        return null;
     }
 
     public void deleteById(String id) {
+//        log.trace("delete{}",id);
         articleDao.deleteById(id);
     }
+
 }

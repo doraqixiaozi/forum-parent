@@ -17,7 +17,6 @@
 *.war
 *.nar
 *.ear
-*.zip
 *.tar.gz
 *.rar
 
@@ -47,3 +46,7 @@ forum-sms/src/main/resources/application.yaml
 **/.mvn/timing.properties
 **/.mvn/wrapper/maven-wrapper.jar
 
+forum-common/src/main/resources/
+forum-manager/src/main/resources/static/static/js/app.65ba56d59b34ad688d65.js
+forum-manager/src/main/resources/static/static/js/manifest.a6e9a8cd3f00c775bf95.js
+src/main/

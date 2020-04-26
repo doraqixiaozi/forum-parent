@@ -55,7 +55,7 @@ public class ReplyService {
 	 * @return
 	 */
 	public PageResult<Reply> findSearch(Map whereMap, int page, int size) {
-		Page<Reply> replys = PageHelper.startPage(page, size);
+		Page<Reply> replys = PageHelper.startPage(page, size,"createtime desc");
 		List<Reply> search = this.findSearch(whereMap);
 		PageResult<Reply> problemPageResult = new PageResult<>(replys.getTotal(),search);
 		return problemPageResult;
@@ -68,15 +68,15 @@ public class ReplyService {
 	 * @return
 	 */
 	public List<Reply> findSearch(Map whereMap) {
-		Example example = new Example(Problem.class);
+		Example example = new Example(Reply.class);
 		Example.Criteria criteria = example.createCriteria();
 		// 编号
 		if (whereMap.get("id")!=null && !"".equals(whereMap.get("id"))) {
-			criteria.andLike("id","%"+(String)whereMap.get("id")+"%");
+			criteria.andEqualTo("id",(String)whereMap.get("id"));
 		}
 		// 问题ID
 		if (whereMap.get("problemid")!=null && !"".equals(whereMap.get("problemid"))) {
-			criteria.andLike("problemid","%"+(String)whereMap.get("problemid")+"%");
+			criteria.andEqualTo("problemid",(String)whereMap.get("problemid"));
 		}
 		// 回答内容
 		if (whereMap.get("content")!=null && !"".equals(whereMap.get("content"))) {
@@ -84,11 +84,11 @@ public class ReplyService {
 		}
 		// 回答人ID
 		if (whereMap.get("userid")!=null && !"".equals(whereMap.get("userid"))) {
-			criteria.andLike("userid","%"+(String)whereMap.get("userid")+"%");
+			criteria.andEqualTo("userid",(String)whereMap.get("userid"));
 		}
 		// 回答人昵称
 		if (whereMap.get("nickname")!=null && !"".equals(whereMap.get("nickname"))) {
-			criteria.andLike("nickname","%"+(String)whereMap.get("nickname")+"%");
+			criteria.andEqualTo("nickname",(String)whereMap.get("nickname"));
 		}
 		return replyMapper.selectByExample(example);
 	}
@@ -108,6 +108,7 @@ public class ReplyService {
 	 */
 	public void add(Reply reply) {
 		reply.setId( idWorker.nextId()+"" );
+		reply.setCreatetime(new Date());
 		replyMapper.insert(reply);
 		Problem problem = problemMapper.selectByPrimaryKey(reply.getProblemid());
 		problem.setUpdatetime(new Date());
@@ -124,11 +125,19 @@ public class ReplyService {
 	}
 
 	/**
-	 * 删除
+	 * 删除,同时需改变problem回复数
 	 * @param id
 	 */
 	public void deleteById(String id) {
 		replyMapper.deleteByPrimaryKey(id);
+
 	}
 
+	public void delete(Reply reply) {
+		replyMapper.deleteByPrimaryKey(reply.getId());
+		Problem problem = problemMapper.selectByPrimaryKey(reply.getProblemid());
+		problem.setUpdatetime(new Date());
+		problem.setReply(problem.getReply()-1);
+		problemMapper.updateByPrimaryKeySelective(problem);
+	}
 }

@@ -58,7 +58,7 @@ public class ProblemController {
 
 
     /**
-     * 分页+多条件查询
+     * 分页+多条件查询，,按照创建时间排序
      *
      * @param searchMap 查询条件封装
      * @param page      页码
@@ -68,6 +68,32 @@ public class ProblemController {
     @RequestMapping(value = "/search/{page}/{size}", method = RequestMethod.POST)
     public Result findSearch(@RequestBody Map searchMap, @PathVariable int page, @PathVariable int size) {
         return new Result(true, StatusCode.OK, "查询成功", problemService.findSearch(searchMap, page, size));
+    }
+
+    /**
+     * 分页+多条件查询,按照回复数排序
+     *
+     * @param searchMap 查询条件封装
+     * @param page      页码
+     * @param size      页大小
+     * @return 分页结果
+     */
+    @RequestMapping(value = "/search/hot/{page}/{size}", method = RequestMethod.POST)
+    public Result findSearchOrderByHot(@RequestBody Map searchMap, @PathVariable int page, @PathVariable int size) {
+        return new Result(true, StatusCode.OK, "查询成功", problemService.findSearchOrderByHot(searchMap, page, size));
+    }
+
+    /**
+     * 分页+多条件查询,按照最新回复时间排序
+     *
+     * @param searchMap 查询条件封装
+     * @param page      页码
+     * @param size      页大小
+     * @return 分页结果
+     */
+    @RequestMapping(value = "/search/new/{page}/{size}", method = RequestMethod.POST)
+    public Result findSearchOrderByNewReply(@RequestBody Map searchMap, @PathVariable int page, @PathVariable int size) {
+        return new Result(true, StatusCode.OK, "查询成功", problemService.findSearchOrderByNewReply(searchMap, page, size));
     }
 
     /**

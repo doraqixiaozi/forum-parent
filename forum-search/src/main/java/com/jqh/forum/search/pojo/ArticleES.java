@@ -22,10 +22,16 @@ public class ArticleES implements Serializable {
     private String id;//ID
     @Field(index = true,store = true,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word",type = FieldType.Text)
     private String title;//标题
-    @Field(index = true,store = false,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word",type = FieldType.Text)
+    @Field(index = true,store = true,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word",type = FieldType.Text)
     private String content;//文章正文
     @Field(index = false,store = true,type = FieldType.Text)
     private String image;//文章封面
+    @Field(index = false,store = true,type = FieldType.Text)
+    private String userid;//用户ID
+    @Field(index = false,store = true,type = FieldType.Text)
+    private String nickname;//用户名
+    @Field(index = false,store = true,type = FieldType.Text)
+    private String avatar;//用户头像
 //    @Field(index = false,store = true,type = FieldType.Date)
 //    private java.util.Date createtime;//发表日期
 //    @Field(index = false,store = true,type = FieldType.Integer)

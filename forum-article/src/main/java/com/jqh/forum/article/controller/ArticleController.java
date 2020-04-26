@@ -152,7 +152,7 @@ public class ArticleController {
 	}
 
 	/**
-	 * 审核/拉黑文章
+	 * 审核/下架文章
 	 */
 	@PutMapping(value="/{articleId}/{state}")
 	public Result changeState( @PathVariable String articleId,@PathVariable String state){
@@ -169,5 +169,14 @@ public class ArticleController {
 		HashMap<Object, Object> searchMap = new HashMap<>();
 		articleService.move(articleId);
 		return new Result(true,StatusCode.OK,"同步成功");
+	}
+
+	/**
+	 * 批量文章中的用户信息
+	 */
+	@PutMapping(value="/user")
+	public Result updateUserData( @PathVariable HashMap userData){
+		articleService.updateUserData(userData);
+		return new Result(true,StatusCode.OK,"更新成功");
 	}
 }

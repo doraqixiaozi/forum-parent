@@ -16,6 +16,9 @@ public class SearchUtil {
         articleES.setId(article.getId());
         articleES.setImage(article.getImage());
         articleES.setTitle(article.getTitle());
+        articleES.setUserid(article.getUserid());
+        articleES.setNickname(article.getNickname());
+        articleES.setAvatar(article.getAvatar());
         return articleES;
     }
 }

@@ -7,6 +7,7 @@ import entity.StatusCode;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,5 +61,17 @@ public class LabelController {
     public Result findByCondition(@RequestBody Label label) {
         List<Label> list= labelService.findByCondition(label);
         return new Result(true, StatusCode.OK, "查询成功", list);
+    }
+
+    @GetMapping("/labelMap")
+    public Result getLabelMap() {
+        List<Label> list= labelService.findAll();
+        HashMap map = new HashMap<>();
+        if ( list != null) {
+            list.forEach(label -> {
+                map.put(label.getId(), label.getLabelname());
+            });
+        }
+        return new Result(true, StatusCode.OK, "查询成功", map);
     }
 }

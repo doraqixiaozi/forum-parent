@@ -58,7 +58,7 @@ public class ProblemService {
      * @return
      */
     public PageResult<Problem> findSearch(Map whereMap, int page, int size) {
-        Page<Problem> problems = PageHelper.startPage(page, size);
+        Page<Problem> problems = PageHelper.startPage(page, size,"createtime desc");
         List<Problem> search = this.findSearch(whereMap);
         PageResult<Problem> problemPageResult = new PageResult<>(problems.getTotal(), search);
         return problemPageResult;
@@ -76,7 +76,7 @@ public class ProblemService {
         Example.Criteria criteria = example.createCriteria();
         // ID
         if (searchMap.get("id") != null && !"".equals(searchMap.get("id"))) {
-            criteria.andLike("id", "%" + (String) searchMap.get("id") + "%");
+            criteria.andEqualTo("id",  (String) searchMap.get("id") );
         }
         // 标题
         if (searchMap.get("title") != null && !"".equals(searchMap.get("title"))) {
@@ -88,7 +88,7 @@ public class ProblemService {
         }
         // 用户ID
         if (searchMap.get("userid") != null && !"".equals(searchMap.get("userid"))) {
-            criteria.andLike("userid", "%" + (String) searchMap.get("userid") + "%");
+            criteria.andEqualTo("userid",  (String) searchMap.get("userid"));
         }
         // 昵称
         if (searchMap.get("nickname") != null && !"".equals(searchMap.get("nickname"))) {
@@ -96,11 +96,15 @@ public class ProblemService {
         }
         // 是否解决
         if (searchMap.get("solve") != null && !"".equals(searchMap.get("solve"))) {
-            criteria.andLike("solve", "%" + (String) searchMap.get("solve") + "%");
+            criteria.andEqualTo("solve", (String) searchMap.get("solve") );
         }
         // 回复人昵称
         if (searchMap.get("replyname") != null && !"".equals(searchMap.get("replyname"))) {
             criteria.andLike("replyname", "%" + (String) searchMap.get("replyname") + "%");
+        }
+        // 所属标签
+        if (searchMap.get("labelid") != null && !"".equals(searchMap.get("labelid"))) {
+            criteria.andEqualTo("labelid", (String) searchMap.get("labelid"));
         }
         return problemMapper.selectByExample(example);
     }
@@ -197,5 +201,19 @@ public class ProblemService {
      */
     public void addThumbup(String problemId) {
         problemMapper.addThumbup(problemId);
+    }
+
+    public PageResult<Problem> findSearchOrderByHot(Map searchMap, int page, int size) {
+        Page<Problem> problems = PageHelper.startPage(page, size,"reply desc");
+        List<Problem> search = this.findSearch(searchMap);
+        PageResult<Problem> problemPageResult = new PageResult<>(problems.getTotal(), search);
+        return problemPageResult;
+    }
+
+    public PageResult<Problem> findSearchOrderByNewReply(Map searchMap, int page, int size) {
+        Page<Problem> problems = PageHelper.startPage(page, size,"replytime desc");
+        List<Problem> search = this.findSearch(searchMap);
+        PageResult<Problem> problemPageResult = new PageResult<>(problems.getTotal(), search);
+        return problemPageResult;
     }
 }

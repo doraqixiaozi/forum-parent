@@ -5,10 +5,12 @@ import java.util.stream.Collectors;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.jqh.forum.recruit.client.BaseClient;
 import com.jqh.forum.recruit.dto.RecruitDTO;
 import com.jqh.forum.recruit.mapper.EnterpriseMapper;
 import com.jqh.forum.recruit.mapper.RecruitMapper;
 import com.jqh.forum.recruit.pojo.Enterprise;
+import entity.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
@@ -35,10 +37,13 @@ public class RecruitService {
     private RecruitMapper recruitMapper;
     @Resource
     private EnterpriseMapper enterpriseMapper;
-    private static HashMap<String,String> enterprises=null;
+    private static HashMap<String, String> enterprises = null;
+    private static HashMap<String, String> labels = null;
 
     @Autowired
     private IdWorker idWorker;
+    @Resource
+    private BaseClient baseClient;
 
     /**
      * 查询全部列表
@@ -62,20 +67,27 @@ public class RecruitService {
         Page<Recruit> recruitPage = PageHelper.startPage(page, size);
         List<Recruit> recruits = this.findSearch(whereMap);
         //如果企业缓存为null则设置缓存
-        if (enterprises==null){
+        if (enterprises == null) {
             List<Enterprise> es = enterpriseMapper.selectAll();
-            enterprises=new HashMap<>();
-            if (es!=null){
+            enterprises = new HashMap<>();
+            if (es != null) {
                 es.forEach(enterprise -> {
-                    enterprises.put(enterprise.getId(),enterprise.getName());
+                    enterprises.put(enterprise.getId(), enterprise.getName());
                 });
             }
+        }
+        //如果标签缓存为null则设置标签缓存
+        if (labels == null) {
+            Result result = baseClient.getLabelMap();
+            HashMap<String,String> map=(HashMap)result.getData();
+            labels = map;
         }
         //将结果集转为dto
         List<RecruitDTO> dtos = recruits.stream().map(r -> {
             RecruitDTO recruitDTO = new RecruitDTO();
             BeanUtils.copyProperties(r, recruitDTO);
             recruitDTO.setEName(enterprises.get(recruitDTO.getEid()));
+            recruitDTO.setLabelName(labels.get(recruitDTO.getLabel()));
             return recruitDTO;
         }).collect(Collectors.toList());
         HashMap hashMap = new HashMap();
@@ -101,8 +113,9 @@ public class RecruitService {
 
     /**
      * 根据查询条件构造条件构造器
+     *
      * @param searchMap 查询条件
-     * @param criteria 条件构造器
+     * @param criteria  条件构造器
      */
     private void makeExample(Map searchMap, Example.Criteria criteria) {
         // ID
@@ -127,7 +140,7 @@ public class RecruitService {
         }
         // 任职方式
         if (searchMap.get("type") != null && !"".equals(searchMap.get("type"))) {
-            criteria.andLike("type", "%" + (String) searchMap.get("type") + "%");
+            criteria.andEqualTo("type",  (String) searchMap.get("type") );
         }
         // 办公地址
         if (searchMap.get("address") != null && !"".equals(searchMap.get("address"))) {
@@ -139,7 +152,7 @@ public class RecruitService {
         }
         // 状态
         if (searchMap.get("state") != null && !"".equals(searchMap.get("state"))) {
-            criteria.andLike("state", "%" + (String) searchMap.get("state") + "%");
+            criteria.andEqualTo("state",  (String) searchMap.get("state") );
         }
         // 网址
         if (searchMap.get("url") != null && !"".equals(searchMap.get("url"))) {
@@ -147,7 +160,7 @@ public class RecruitService {
         }
         // 标签
         if (searchMap.get("label") != null && !"".equals(searchMap.get("label"))) {
-            criteria.andLike("label", "%" + (String) searchMap.get("label") + "%");
+            criteria.andEqualTo("label",  (String) searchMap.get("label"));
         }
         // 职位描述
         if (searchMap.get("content1") != null && !"".equals(searchMap.get("content1"))) {
@@ -200,12 +213,12 @@ public class RecruitService {
     }
 
     //查询推荐职位，按创建时间排序的第一页的6个
-    public List<Recruit> selectByState(String state,boolean isEquals) {
+    public List<Recruit> selectByState(String state, boolean isEquals) {
         Example example = new Example(Recruit.class);
         Example.Criteria criteria = example.createCriteria();
         if (isEquals) {
             criteria.andEqualTo("state", state);
-        }else {
+        } else {
             criteria.andNotEqualTo("state", state);
         }
         example.setOrderByClause("createtime Desc");

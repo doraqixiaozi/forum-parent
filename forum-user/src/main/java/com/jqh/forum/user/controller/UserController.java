@@ -204,6 +204,7 @@ public Result register(@PathVariable String code,@RequestBody User user){
 		resultMap.put("token",map.get("token"));
 		resultMap.put("roles","user");
 		resultMap.put("id",map.get("id"));
+		resultMap.put("avatar",map.get("avatar"));
 		return new Result(true, StatusCode.OK, "登录成功",resultMap);
 	}
 
