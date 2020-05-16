@@ -113,6 +113,9 @@ public class ReplyService {
 		Problem problem = problemMapper.selectByPrimaryKey(reply.getProblemid());
 		problem.setUpdatetime(new Date());
 		problem.setReply(problem.getReply()+1);
+		problem.setReplyid(reply.getUserid());
+		problem.setReplyname(reply.getNickname());
+		problem.setReplytime(new Date());
 		problemMapper.updateByPrimaryKeySelective(problem);
 	}
 

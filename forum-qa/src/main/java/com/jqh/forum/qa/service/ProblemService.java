@@ -58,7 +58,7 @@ public class ProblemService {
      * @return
      */
     public PageResult<Problem> findSearch(Map whereMap, int page, int size) {
-        Page<Problem> problems = PageHelper.startPage(page, size,"createtime desc");
+        Page<Problem> problems = PageHelper.startPage(page, size, "createtime desc");
         List<Problem> search = this.findSearch(whereMap);
         PageResult<Problem> problemPageResult = new PageResult<>(problems.getTotal(), search);
         return problemPageResult;
@@ -76,7 +76,7 @@ public class ProblemService {
         Example.Criteria criteria = example.createCriteria();
         // ID
         if (searchMap.get("id") != null && !"".equals(searchMap.get("id"))) {
-            criteria.andEqualTo("id",  (String) searchMap.get("id") );
+            criteria.andEqualTo("id", (String) searchMap.get("id"));
         }
         // 标题
         if (searchMap.get("title") != null && !"".equals(searchMap.get("title"))) {
@@ -88,7 +88,7 @@ public class ProblemService {
         }
         // 用户ID
         if (searchMap.get("userid") != null && !"".equals(searchMap.get("userid"))) {
-            criteria.andEqualTo("userid",  (String) searchMap.get("userid"));
+            criteria.andEqualTo("userid", (String) searchMap.get("userid"));
         }
         // 昵称
         if (searchMap.get("nickname") != null && !"".equals(searchMap.get("nickname"))) {
@@ -96,7 +96,7 @@ public class ProblemService {
         }
         // 是否解决
         if (searchMap.get("solve") != null && !"".equals(searchMap.get("solve"))) {
-            criteria.andEqualTo("solve", (String) searchMap.get("solve") );
+            criteria.andEqualTo("solve", (String) searchMap.get("solve"));
         }
         // 回复人昵称
         if (searchMap.get("replyname") != null && !"".equals(searchMap.get("replyname"))) {
@@ -106,16 +106,21 @@ public class ProblemService {
         if (searchMap.get("labelid") != null && !"".equals(searchMap.get("labelid"))) {
             criteria.andEqualTo("labelid", (String) searchMap.get("labelid"));
         }
+        // 用户ID
+        if (searchMap.get("replyid") != null && !"".equals(searchMap.get("replyid"))) {
+            criteria.andEqualTo("replyid", (String) searchMap.get("replyid"));
+        }
         return problemMapper.selectByExample(example);
     }
 
     /**
-     * 根据ID查询实体
+     * 根据ID查询实体,从这个方法进来的都是浏览详情，所以需要把浏览量+1
      *
      * @param id
      * @return
      */
     public Problem findById(String id) {
+        problemMapper.addVisits(id);
         return problemMapper.selectByPrimaryKey(id);
     }
 
@@ -132,10 +137,10 @@ public class ProblemService {
         problem.setId(idWorker.nextId() + "");
         problem.setUpdatetime(new Date());
         problem.setCreatetime(new Date());
-        problem.setReply((long)0);
-        problem.setThumbup((long)0);
+        problem.setReply((long) 0);
+        problem.setThumbup((long) 0);
         problem.setSolve("0");
-        problem.setVisits((long)0);
+        problem.setVisits((long) 0);
         problemMapper.insert(problem);
     }
 
@@ -197,6 +202,7 @@ public class ProblemService {
 
     /**
      * 点赞
+     *
      * @param problemId
      */
     public void addThumbup(String problemId) {
@@ -204,14 +210,14 @@ public class ProblemService {
     }
 
     public PageResult<Problem> findSearchOrderByHot(Map searchMap, int page, int size) {
-        Page<Problem> problems = PageHelper.startPage(page, size,"reply desc");
+        Page<Problem> problems = PageHelper.startPage(page, size, "reply desc");
         List<Problem> search = this.findSearch(searchMap);
         PageResult<Problem> problemPageResult = new PageResult<>(problems.getTotal(), search);
         return problemPageResult;
     }
 
     public PageResult<Problem> findSearchOrderByNewReply(Map searchMap, int page, int size) {
-        Page<Problem> problems = PageHelper.startPage(page, size,"replytime desc");
+        Page<Problem> problems = PageHelper.startPage(page, size, "replytime desc");
         List<Problem> search = this.findSearch(searchMap);
         PageResult<Problem> problemPageResult = new PageResult<>(problems.getTotal(), search);
         return problemPageResult;

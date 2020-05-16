@@ -57,9 +57,9 @@ public class GatheringService {
 	 * @return
 	 */
 	public PageResult<Gathering> findSearch(Map whereMap, int page, int size) {
-		Page<Gathering> problems = PageHelper.startPage(page, size);
+		Page<Gathering> gatherings = PageHelper.startPage(page, size,"starttime desc");
 		List<Gathering> search = this.findSearch(whereMap);
-		PageResult<Gathering> problemPageResult = new PageResult<>(problems.getTotal(), search);
+		PageResult<Gathering> problemPageResult = new PageResult(gatherings.getTotal(), search);
 		return problemPageResult;
 	}
 

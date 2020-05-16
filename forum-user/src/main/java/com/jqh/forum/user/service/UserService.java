@@ -148,7 +148,11 @@ public class UserService {
      * @return
      */
     public User findById(String id) {
-        return userMapper.selectByPrimaryKey(id);
+        User user = userMapper.selectByPrimaryKey(id);
+        if(user!=null) {
+            user.setPassword(null);
+        }
+        return user;
     }
 
     /**

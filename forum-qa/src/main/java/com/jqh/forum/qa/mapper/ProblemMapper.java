@@ -26,4 +26,7 @@ public interface ProblemMapper extends Mapper<Problem> {
 
     @Update("update tb_problem set thumbup=thumbup+1 where id=#{problemId}")
     void addThumbup(String problemId);
+
+    @Update("update tb_problem set visits=visits+1 where id=#{problemId}")
+    void addVisits(String problemId);
 }

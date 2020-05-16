@@ -1,6 +1,7 @@
 package com.jqh.forum.recruit.service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -11,6 +12,7 @@ import com.jqh.forum.recruit.mapper.RecruitMapper;
 import com.jqh.forum.recruit.pojo.Recruit;
 import entity.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +34,9 @@ public class EnterpriseService {
     private EnterpriseMapper enterpriseMapper;
     @Resource
     private RecruitMapper recruitMapper;
-
+    private static String enterprisesKey = "enterprises";
+    @Resource
+    private RedisTemplate redisTemplate;
     @Autowired
     private IdWorker idWorker;
 
@@ -63,6 +67,19 @@ public class EnterpriseService {
         return enterprisePageResult;
     }
 
+    /**
+     * 更新redis中的企业缓存
+     */
+    private void updateCatche() {
+        List<Enterprise> es = enterpriseMapper.selectAll();
+        HashMap<String,String> Emap = new HashMap<>();
+        if (es != null) {
+            for (Enterprise e:es) {
+                Emap.put(e.getId(), e.getName());
+            }
+        }
+        redisTemplate.opsForValue().set(enterprisesKey,Emap, 30, TimeUnit.MINUTES);
+    }
 
     /**
      * 条件查询
@@ -130,6 +147,7 @@ public class EnterpriseService {
     public void add(Enterprise enterprise) {
         enterprise.setId(idWorker.nextId() + "");
         enterpriseMapper.insert(enterprise);
+        updateCatche();
     }
 
     /**
@@ -139,6 +157,7 @@ public class EnterpriseService {
      */
     public void update(Enterprise enterprise) {
         enterpriseMapper.updateByPrimaryKey(enterprise);
+        updateCatche();
     }
 
     /**
@@ -150,14 +169,15 @@ public class EnterpriseService {
     public void deleteById(String id) {
         enterpriseMapper.deleteByPrimaryKey(id);
         Example example = new Example(Recruit.class);
-        example.createCriteria().andEqualTo("eid",id);
+        example.createCriteria().andEqualTo("eid", id);
         recruitMapper.deleteByExample(example);
+        updateCatche();
     }
 
     //查询热门企业
-    public List<Enterprise> selectByIsHot(String isHot){
+    public List<Enterprise> selectByIsHot(String isHot) {
         Example example = new Example(Enterprise.class);
-        example.createCriteria().andEqualTo("ishot",isHot);
+        example.createCriteria().andEqualTo("ishot", isHot);
         return enterpriseMapper.selectByExample(example);
     }
 }
