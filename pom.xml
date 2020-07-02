@@ -39,7 +39,7 @@
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
         <mapper.starter.version>2.1.5</mapper.starter.version>
-        <mysql.version>8.0.12</mysql.version>
+        <mysql.version>8.0.16</mysql.version>
         <spring-boot.version>2.1.4.RELEASE</spring-boot.version>
         <jqh-common.version>1.0-SNAPSHOT</jqh-common.version>
         <javax-persistence.version>1.0</javax-persistence.version>
