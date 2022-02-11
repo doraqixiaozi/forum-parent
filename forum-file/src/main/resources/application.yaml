@@ -7,7 +7,7 @@ spring:
     name: forum-file
   #消息总线需要使用此地址
   rabbitmq:
-    host: 127.0.0.1
+    host: 192.168.200.128
 logging:
   level:
     #    可以细分到每个包的日志级别
@@ -47,3 +47,11 @@ hystrix:
 image:
   url:
     prefix: http://127.0.0.1:${server.port}
+
+#这里申请的是深圳的阿里云oss服务
+aliyun:
+  oss:
+    endpoint: http://oss-cn-shenzhen.aliyuncs.com # 申请完成oss服务会给，oss对外服务的访问域名
+    accessKeyId:  # 申请完成oss服务会给，访问身份验证中用到用户标识
+    accessKeySecret:  # 申请完成oss服务会给，用户用于加密签名字符串和oss用来验证签名字符串的密钥
+    bucketName: zrf-pic-storage # oss的存储空间
